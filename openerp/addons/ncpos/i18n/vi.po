@@ -1,0 +1,324 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* ncpos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0-20150608\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-27 04:08+0000\n"
+"PO-Revision-Date: 2016-05-27 14:00+0700\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: vi_VN\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#. module: ncpos
+#: model:ir.actions.act_window,help:ncpos.product_manage_action
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new product.\n"
+"              </p><p>\n"
+"                You must define a product for everything you sell through\n"
+"                the point of sale interface.\n"
+"              </p><p>\n"
+"                Do not forget to set the price and the point of sale category\n"
+"                in which it should appear. If a product has no point of sale\n"
+"                category, you can not sell it through the point of sale\n"
+"                interface.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new product.\n"
+"              </p><p>\n"
+"                You must define a product for everything you sell through\n"
+"                the point of sale interface.\n"
+"              </p><p>\n"
+"                Do not forget to set the price and the point of sale category\n"
+"                in which it should appear. If a product has no point of sale\n"
+"                category, you can not sell it through the point of sale\n"
+"                interface.\n"
+"              </p>\n"
+"            "
+
+#. module: ncpos
+#: model:ir.actions.act_window,help:ncpos.pos_account_journal_manage_action
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a payment method.\n"
+"              </p><p>\n"
+"                Payment methods are defined by accounting journals having the\n"
+"                field <i>PoS Payment Method</i> checked. In order to be useable\n"
+"                from the touchscreen interface, you must set the payment method\n"
+"                on the <i>Point of Sale</i> configuration.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a payment method.\n"
+"              </p><p>\n"
+"                Payment methods are defined by accounting journals having the\n"
+"                field <i>PoS Payment Method</i> checked. In order to be useable\n"
+"                from the touchscreen interface, you must set the payment method\n"
+"                on the <i>Point of Sale</i> configuration.\n"
+"              </p>\n"
+"            "
+
+#. module: ncpos
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Access Rights"
+msgstr "Quyền truy cập"
+
+#. module: ncpos
+#: model:res.groups,name:ncpos.group_pos_admin
+msgid "Administrator"
+msgstr "Administrator"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_op_stock_operation
+msgid "All Operations"
+msgstr "Nhập / xuất"
+
+#. module: ncpos
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Allowed Companies"
+msgstr "Công ty được gán phép"
+
+#. module: ncpos
+#: field:res.partner,billing_email_template:0
+msgid "Billing email template"
+msgstr "Mẫu email hóa đơn"
+
+#. module: ncpos
+#: view:product.uom:ncpos.pos_product_uom_search
+msgid "Category"
+msgstr "Danh mục"
+
+#. module: ncpos
+#: field:pos.order.line,description:0
+msgid "Description"
+msgstr "Mô tả"
+
+#. module: ncpos
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Email Address"
+msgstr "Địa chỉ thư điện tử"
+
+#. module: ncpos
+#: field:pos.order,consumer_email:0
+msgid "Email of consumer"
+msgstr "Email của khách tiêu dùng"
+
+#. module: ncpos
+#: code:addons\ncpos\point_of_sale.py:46
+#, python-format
+msgid "Error!"
+msgstr "Lỗi!"
+
+#. module: ncpos
+#: view:product.uom:ncpos.pos_product_uom_search
+msgid "Group By"
+msgstr "Nhóm bởi"
+
+#. module: ncpos
+#. openerp-web
+#: code:addons\ncpos\static\src\xml\template.xml:14
+#, python-format
+msgid "Import"
+msgstr "Import"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_form_view
+msgid "Information"
+msgstr "Thông tin"
+
+#. module: ncpos
+#: model:ir.model,name:ncpos.model_pos_order_line
+msgid "Lines of Point of Sale"
+msgstr "Chi tiết đơn hàng lẻ"
+
+#. module: ncpos
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Localization"
+msgstr "Vùng "
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_pos_master_root
+msgid "Master Data"
+msgstr "Cài đặt"
+
+#. module: ncpos
+#: code:addons\ncpos\point_of_sale.py:68
+#, python-format
+msgid "No cash statement found for this session. Unable to record returned cash."
+msgstr "No cash statement found for this session. Unable to record returned cash."
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_pos_operation_root
+msgid "Operations"
+msgstr "Vận hành"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.pos_pos_config_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_pos_configs
+msgid "POS Machine"
+msgstr "Điểm bán hàng"
+
+#. module: ncpos
+#: code:addons\ncpos\point_of_sale.py:46
+#, python-format
+msgid "POS order is not attached to an opened session."
+msgstr "Đơn hàng bán lẻ không nằm trong ca bán hàng đang hoạt động"
+
+#. module: ncpos
+#: model:ir.model,name:ncpos.model_res_partner
+msgid "Partner"
+msgstr "Đối tác"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_op_partner_ledger
+msgid "Partner Ledger"
+msgstr "Sổ công nợ"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.pos_account_journal_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_account_journals
+msgid "Payment Methods"
+msgstr "Phương thức thanh toán"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_operation_payment
+msgid "Payments"
+msgstr "Công nợ"
+
+#. module: ncpos
+#: model:ir.model,name:ncpos.model_pos_order
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Point of Sale"
+msgstr "Điểm bán hàng"
+
+#. module: ncpos
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Preferences"
+msgstr "Tham chiếu"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_kanban_view
+msgid "Price:"
+msgstr "Giá:"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_operation_procurement
+msgid "Procurement"
+msgstr "Mua vào"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_form_view
+#: view:product.template:ncpos.pos_product_tree_view
+msgid "Product"
+msgstr "Sản phẩm"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_form_view
+msgid "Product Name"
+msgstr "Tên sản phẩm"
+
+#. module: ncpos
+#: field:pos.order.line,uos:0
+msgid "Product UoS"
+msgstr "Đơn vị bán hàng"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.product_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_product
+#: model:ir.ui.menu,name:ncpos.menu_pos_backoffice_products
+msgid "Products"
+msgstr "Các sản phẩm"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.op_purchase_order_action
+#: model:ir.ui.menu,name:ncpos.menu_op_purchase_orders
+msgid "Purchase Orders"
+msgstr "Lệnh mua hàng"
+
+#. module: ncpos
+#: field:pos.order.line,uos_qty:0
+msgid "Quantity (UoS)"
+msgstr "Số lương (đ.vị bán)"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.pos_res_user_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_res_users
+msgid "Sale Users"
+msgstr "Thu ngân"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_pos_backoffice_settings
+msgid "Settings"
+msgstr "Các thiết lập"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_operation_stock
+msgid "Stock Keeper"
+msgstr "Thủ kho"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.pos_stock_location_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_stock_locations
+msgid "Stock Location"
+msgstr "Kho hàng"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_op_supplier_invoices
+msgid "Supplier Invoices"
+msgstr "Hóa đơn nhà cung cấp"
+
+#. module: ncpos
+#: model:ir.ui.menu,name:ncpos.menu_op_supplier_payments
+msgid "Supplier Payments"
+msgstr "Trả tiền nhà cung cấp"
+
+#. module: ncpos
+#: help:res.partner,billing_email_template:0
+msgid "Template document of billing email"
+msgstr "Template document of billing email"
+
+#. module: ncpos
+#: model:ir.actions.act_window,name:ncpos.pos_product_uom_manage_action
+#: model:ir.ui.menu,name:ncpos.menu_manage_product_uom
+#: view:product.uom:ncpos.pos_product_uom_search
+msgid "Units of Measure"
+msgstr "Đơn vị tính"
+
+#. module: ncpos
+#: model:ir.model,name:ncpos.model_res_users
+#: view:res.users:ncpos.pos_view_users_form
+msgid "Users"
+msgstr "Người dùng"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_kanban_view
+msgid "Variants"
+msgstr "Biến thể"
+
+#. module: ncpos
+#: view:product.template:ncpos.pos_product_form_view
+msgid "describe the product characteristics..."
+msgstr "Mô tả đặc điểm của sản phẩm..."
+
+#. module: ncpos
+#: code:addons\ncpos\point_of_sale.py:67
+#, python-format
+msgid "error!"
+msgstr "lỗi!"
+
+#. module: ncpos
+#: code:addons\ncpos\point_of_sale.py:73
+#, python-format
+msgid "return"
+msgstr "return"

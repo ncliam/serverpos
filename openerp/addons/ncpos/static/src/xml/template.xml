@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+	
+	<t t-extend="ListView.buttons">
+		<t t-jquery="a.oe_list_button_import" t-operation="replace" />
+		<t t-jquery="span.oe_alternative span.oe_fade" t-operation="replace" />
+		<!-- 
+		<t t-jquery="span.oe_alternative">
+	        this.removeAttr('t-if');
+	    </t>
+	    -->
+	    <t t-jquery="span.oe_alternative" t-operation="append" >
+	    	<t groups="base.group_system">
+            	<a href="#" class="oe_bold oe_list_button_import">Import</a>
+            </t>
+        </t>
+	    
+	    
+        
+    </t>
+ 
+</templates>
+

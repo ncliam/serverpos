@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>        
+        <record id="pos_registration_tree_view" model="ir.ui.view">
+            <field name="name">pos.registration.tree</field>
+            <field name="model">pos.registration</field>
+            <field name="arch" type="xml">
+                <tree string="Registration">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="company_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="pos_registration_form_view" model="ir.ui.view">
+            <field name="name">pos.registration.form</field>
+            <field name="model">pos.registration</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <form string="Registration">
+                    <header>                        
+                        <button name="action_aprrove" string="Approve" type="object" states="draft" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,approved" />
+                    </header>
+                    <sheet>                        
+                        <div class="oe_left" style="width: 500px;">                            
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="Business Name"/>
+                                <h1><field name="name" class="oe_inline"/></h1>
+                            </div>                            
+                        </div>
+                        <group col="4">                        	
+	                        <field name="email" />
+	                        <field name="password" />
+	                    </group>
+	                    <group col="4">	                    	
+	                        <field name="phone" />             	
+	                        <field name="currency_id" />
+	                        <field name="lang" />
+	                        <field name="tz" />
+	                    </group>
+                        <notebook>
+                            <page string="Data created">
+                                <group colspan="4">
+                                    <group>
+                                    	<field name="user_id" />
+                                        <field name="company_id" />
+                                    </group>                                    
+                                </group>
+                            </page>               
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="pos_registration_action" model="ir.actions.act_window">
+            <field name="name">POS Registration</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.registration</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="pos_registration_tree_view" />
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new registration.
+              </p><p>
+                Registration will included information of user account.
+                Approve this registration to init user account data for his own business.
+              </p>
+            </field>
+        </record>
+                      
+        <menuitem action="pos_registration_action" id="menu_pos_registration" parent="base.menu_res_company_global" sequence="10" />
+                
+    </data>
+    <data noupdate="1">
+    	<!--Email template -->
+        <record id="email_template_register_success" model="email.template">
+            <field name="name">Success Registration Email</field>
+            <field name="email_from">admin@multimex.com.vn</field>
+            <field name="email_to">${object.email}</field>
+            <field name="subject">Register Success</field>
+            <field name="model_id" ref="model_pos_registration"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.user_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Hello ${object.user_id.name},</p>
+
+    <p>Your login is: </p>
+    
+    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">       
+       &nbsp;&nbsp;Username: <strong>${object.user_id.login}</strong><br />
+       &nbsp;&nbsp;Password: <strong>${object.password}</strong><br />
+    </p>
+    <br/>
+    <p>If you have any question, do not hesitate to contact us.</p>
+    <p>Thank you for choosing us!</p>
+</div>
+            ]]></field>
+        </record>
+    </data>
+</openerp>

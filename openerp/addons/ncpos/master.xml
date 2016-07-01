@@ -1,0 +1,304 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Top menu item -->
+        <menuitem name="Master Data" id="menu_pos_master_root" groups="group_pos_admin" />
+        	<menuitem name="Products" id="menu_pos_backoffice_products" parent="menu_pos_master_root" sequence="15" groups="group_pos_admin" />
+        	<menuitem name="Settings" id="menu_pos_backoffice_settings" parent="menu_pos_master_root" sequence="15" groups="group_pos_admin" />
+        
+        <record id="pos_product_tree_view" model="ir.ui.view">
+            <field name="name">pos.product.tree</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree string="Product">
+                    <field name="name"/>
+                    <field name="list_price"/>
+                    <field name="type"/>
+                    <field name="state"/>
+                    <field name="uom_id" />
+                </tree>
+            </field>
+        </record>
+        
+        <record id="pos_product_form_view" model="ir.ui.view">
+            <field name="name">pos.product.form</field>
+            <field name="model">product.template</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <form string="Product">
+                    
+                    <sheet>
+                        <field name="id" invisible="True"/>
+                        <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+                        </div>
+                        <div class="oe_left" style="width: 500px;">
+                            <field name="image_medium" widget="image" class="oe_avatar oe_left"/>
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="Product Name"/>
+                                <h1><field name="name" class="oe_inline"/></h1>
+                            </div>                            
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group colspan="4">
+                                    <group>
+                                        <field name="type" on_change="onchange_type(type)"/>
+                                        <field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" />
+                                        <field name="list_price"/>
+                                    </group>
+                                    <group>
+                                        <field name="active"/>
+                                        <field name="ean13" />
+                                        <field name="default_code" />
+                                    </group>
+                                </group>
+                                <group colspan="4">
+                                    <field name="company_id" groups="base.group_multi_company" widget="selection"/>
+                                </group>
+                                <field name="description" placeholder="describe the product characteristics..."/>
+                            </page>
+                            <page string="Procurements" groups="base.group_user">
+                                <group name="procurement">
+                                    <group name="general">
+                                        <field name="standard_price"/>
+                                    </group>
+                                    <group name="procurement_uom" groups="product.group_uom" string="Purchase">
+                                        <field name="uom_po_id"/>
+                                    </group>
+                                </group>
+                                <separator string="Suppliers"/>
+                                <field name="seller_ids"/>
+                                <separator string="Description for Suppliers"/>
+                                <field name="description_purchase" placeholder="This note will be displayed on requests for quotation..."/>
+                            </page>                          
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+		
+        <record id="pos_product_kanban_view" model="ir.ui.view">
+            <field name="name">pos.product.kanban</field>
+            <field name="model">product.template</field>
+            <field name="domain" eval="[('available_in_pos','&lt;&gt;',False)]"/>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="image_small"/>
+                    <field name="lst_price"/>
+                    <field name="is_product_variant"/>
+                    <field name="product_variant_count"/>
+                    <field name="product_variant_ids"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette oe_semantic_html_override">
+                                <a type="open"><img t-att-src="kanban_image('product.template', 'image_small', record.id.value)" class="oe_kanban_image"/></a>
+                                <div class="oe_kanban_details">
+                                    <h4>
+                                        <a type="open">
+                                             <span t-if="record.default_code.value">
+                                                 [<field name="default_code"/>]
+                                              </span>
+                                             <field name="name"/> 
+                                        </a>
+                                    </h4>
+                                    <a name="%(product.product_variant_action)d" type="action">
+                                        <t t-esc="record.product_variant_count.value"/> Variants
+                                    </a>
+                                    <div name="tags"/>
+                                    <ul>
+                                        <li>Price: <field name="lst_price"></field></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        
+        <record id="product_manage_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="context" eval="{}"/>
+            <field name="domain" eval="[('available_in_pos','&lt;&gt;',False)]"/>
+            <field name="view_id" ref="ncpos.pos_product_tree_view" />
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new product.
+              </p><p>
+                You must define a product for everything you sell through
+                the point of sale interface.
+              </p><p>
+                Do not forget to set the price and the point of sale category
+                in which it should appear. If a product has no point of sale
+                category, you can not sell it through the point of sale
+                interface.
+              </p>
+            </field>
+        </record>  
+        
+        <record model="ir.actions.act_window.view" id="act_pos_product_tree_view">
+		    <field eval="1" name="sequence"/>
+		    <field name="view_mode">tree</field>
+		    <field name="view_id" ref="pos_product_tree_view"/>
+		    <field name="act_window_id" ref="product_manage_action"/>
+		</record>
+
+		<record model="ir.actions.act_window.view" id="act_pos_product_form_view">
+		    <field eval="1" name="sequence"/>
+		    <field name="view_mode">form</field>
+		    <field name="view_id" ref="pos_product_form_view"/>
+		    <field name="act_window_id" ref="product_manage_action"/>
+		</record>
+		
+		<record model="ir.actions.act_window.view" id="act_pos_product_kanban_view">
+		    <field eval="1" name="sequence"/>
+		    <field name="view_mode">kanban</field>
+		    <field name="view_id" ref="pos_product_kanban_view"/>
+		    <field name="act_window_id" ref="product_manage_action"/>
+		</record>
+        
+              
+        <menuitem action="product_manage_action" id="menu_manage_product" parent="menu_pos_backoffice_products" sequence="2" groups="group_pos_admin"/>
+        
+        
+        <record model="ir.ui.view" id="pos_product_uom_search">
+            <field name="name">pos.product.uom.search</field>
+            <field name="model">product.uom</field>
+            <field name="arch" type="xml">
+                <search string="Units of Measure">                    
+                    <group expand="1" string="Group By">
+                        <filter name="groupby_category" context="{'group_by' : 'category_id'}" string="Category"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+        
+        
+        <record id="pos_product_uom_manage_action" model="ir.actions.act_window">
+            <field name="name">Units of Measure</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.uom</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="pos_product_uom_search"/>
+        </record>  
+        
+        <menuitem action="pos_product_uom_manage_action" id="menu_manage_product_uom" parent="menu_pos_backoffice_products" sequence="2" groups="group_pos_admin"/>
+        
+        <record id="pos_view_users_form" model="ir.ui.view">
+            <field name="name">pos.res.users.form</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <form string="Users">
+                    <sheet>                     
+                        
+                        <field name="image" widget='image' class="oe_avatar oe_left" options='{"preview_image": "image_medium"}'/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name"/></h1>                            
+                            <label for="login" class="oe_edit_only" string="Email Address"/>
+                            <h2><field name="login" on_change="on_change_login(login)"/></h2>
+                            <label for="company_id" class="oe_edit_only" groups="base.group_multi_company"/>
+                            <field name="company_id" context="{'user_preference': 0}" groups="base.group_multi_company"/>
+                            <group>
+                                <field name="partner_id" readonly="1" required="0" groups="base.group_no_one"
+                                        attrs="{'invisible': [('id', '=', False)]}"/>
+                                <field name="active"/>
+                            </group>
+                        </div>
+                        <notebook colspan="4">
+                            <page string="Access Rights">
+                                <group string="Allowed Companies" groups="base.group_multi_company">
+                                    <field name="company_ids" nolabel="1" widget="many2many_tags"/>
+                                </group>
+                                <group col="4">
+                                    <field name="groups_id" groups="base.group_system"/>
+                                </group>
+                            </page>
+                            <page string="Preferences">
+                                <group>
+                                    <group string="Localization" name="preferences">
+                                        <field name="lang"/>
+                                        <field name="tz"/>
+                                    </group>                                    
+                                </group>
+                                <group string="Point of Sale">
+	                                <field name="pos_config" required="1" />                              
+	                            </group>	                            
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="pos_res_user_manage_action" model="ir.actions.act_window">
+            <field name="name">Sale Users</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.users</field>            
+            <field name="view_mode">tree,form</field>
+        </record>        
+        
+        <record model="ir.actions.act_window.view" id="act_pos_user_tree_view">
+		    <field eval="1" name="sequence"/>
+		    <field name="view_mode">tree</field>
+		    <field name="act_window_id" ref="pos_res_user_manage_action"/>
+		</record>
+        <record model="ir.actions.act_window.view" id="act_pos_user_form_view">
+        	<field eval="2" name="sequence"/>
+		    <field name="view_mode">form</field>
+		    <field name="view_id" ref="pos_view_users_form"/>
+		    <field name="act_window_id" ref="pos_res_user_manage_action"/>
+		</record>
+		
+        <menuitem action="pos_res_user_manage_action" id="menu_manage_res_users" parent="menu_pos_backoffice_settings" sequence="2" groups="group_pos_admin"/>
+        
+        <record id="pos_pos_config_manage_action" model="ir.actions.act_window">
+            <field name="name">POS Machine</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.config</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>  
+        <menuitem action="pos_pos_config_manage_action" id="menu_manage_pos_configs" parent="menu_pos_backoffice_settings" sequence="3" groups="group_pos_admin"/>
+        
+        <record id="pos_stock_location_manage_action" model="ir.actions.act_window">
+            <field name="name">Stock Location</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.location</field>
+            <field name="view_type">form</field>
+            <field name="domain">[('usage','=','internal')]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem action="pos_stock_location_manage_action" id="menu_manage_stock_locations" parent="menu_pos_backoffice_settings" sequence="4" groups="group_pos_admin"/>
+        
+        <record id="pos_account_journal_manage_action" model="ir.actions.act_window">
+            <field name="name">Payment Methods</field>
+            <field name="res_model">account.journal</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', 'in', ['bank', 'cash'])]</field>         
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a payment method.
+              </p><p>
+                Payment methods are defined by accounting journals having the
+                field <i>PoS Payment Method</i> checked. In order to be useable
+                from the touchscreen interface, you must set the payment method
+                on the <i>Point of Sale</i> configuration.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="pos_account_journal_manage_action" id="menu_manage_account_journals" parent="menu_pos_backoffice_settings"  sequence="5" groups="group_pos_admin"/>
+    </data>
+</openerp>
