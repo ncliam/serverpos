@@ -38,7 +38,7 @@ Main Features
 * Listen to new order from mobility POS
     """,
     'author': 'ncliam',
-    'depends': ['point_of_sale','base_import'],
+    'depends': ['point_of_sale','base_import','account', 'auth_signup'],
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',

@@ -47,17 +47,14 @@ def generate_random_pass():
 class POSRegistrationHome(http.Controller):
 
     @http.route('/web/pos_registration', type='json', auth='public')
-    def pos_registration(self, *args, **kw):
-        
-
-        return {
-            "session_id": request.session_id,
-            "uid": request.session.uid,
-            "user_context": request.session.get_context() if request.session.uid else {},
-            "db": request.session.db,
-            "username": request.session.login,
-            "company_id": request.env.user.company_id.id if request.session.uid else None,
+    def pos_registration(self, business_name, email, phone):
+        vals = {
+            'name': business_name,
+            'email': email,
+            'phone': phone
         }
+        return request.registry['pos.registration'].create(request.cr, SUPERUSER_ID, vals, context={})
+
 
 class pos_registration(osv.osv):  
     _name = "pos.registration"
@@ -67,11 +64,11 @@ class pos_registration(osv.osv):
         'email': fields.char('Email', required=True),
         'phone': fields.char('Phone'),
         'password': fields.char('Password'),
-        'currency_id': fields.many2one('res.currency', 'Currency', required=True),
+        'currency_id': fields.many2one('res.currency', 'Currency'),
         'lang': fields.selection(_lang_get, 'Language'),
         'tz': fields.selection(_tz_get,  'Timezone', size=64),
         'state': fields.selection([('draft', 'Request'),
-                                   ('aprroved', 'Approved')],
+                                   ('approved', 'Approved')],
                                   'Status', readonly=True, copy=False),
         'company_id':fields.many2one('res.company', 'Company Created', readonly=True),
         'user_id': fields.many2one('res.users', 'User Created', readonly=True),
@@ -185,19 +182,28 @@ class pos_registration(osv.osv):
                     'company_id': company_id,
                 }
                 sale_journal_id = self.pool.get('account.journal').create(cr, uid, sale_journal_data, context=context)
-                
+            # Default Price list
+            
+            
+             
             # Create POS Config
             pos_config_id = user.pos_config and user.pos_config.id or False
             if not user.pos_config:
                 payment_ids = []
                 payment_ids.append(cash_journal_id)
                 payment_ids.append(bank_journal_id)
+                pricelist_id = self.pool.get('product.pricelist').create(cr, uid, {
+                                                                            'name': _('Pricelist [%s]') % reg.name,
+                                                                            'company_id': company_id,
+                                                                            'currency_id': reg.currency_id and reg.currency_id.id or False,
+                                                                        }, context=context)
                 pos_config_data = {
                     'name': _('POS [%s]') % reg.name,
                     'journal_ids': [(6,0,payment_ids)],
                     'journal_id': sale_journal_id,
                     'stock_location_id': stock_location_id,
                     'company_id': company_id,
+                    'pricelist_id': pricelist_id,
                 }
                 pos_config_id = self.pool.get('pos.config').create(cr, uid, pos_config_data, context=context)            
                 self.pool.get("res.users").write(cr, uid, user_id, {'pos_config': pos_config_id}, context=context)
