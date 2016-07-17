@@ -42,6 +42,7 @@ Main Features
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',
+             'view/view.xml',
              'point_of_sale_view.xml',
              'master.xml',
              'operation.xml',

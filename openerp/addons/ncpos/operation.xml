@@ -5,48 +5,47 @@
                 
         <menuitem name="Operations" id="menu_pos_operation_root" groups="group_pos_admin" />
         	<menuitem name="Point of Sale" id="menu_operation_pos" parent="menu_pos_operation_root" sequence="1" groups="group_pos_admin" />
-        	<menuitem name="Procurement" id="menu_operation_procurement" parent="menu_pos_operation_root" sequence="2" groups="group_pos_admin" />
-        	<menuitem name="Stock Keeper" id="menu_operation_stock" parent="menu_pos_operation_root" sequence="3" groups="group_pos_admin" />
-        	<menuitem name="Payments" id="menu_operation_payment" parent="menu_pos_operation_root" sequence="4" groups="group_pos_admin" />
+        
+        <record id="view_pos_order_filter" model="ir.ui.view">
+            <field name="name">pos.order.list.select</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_filter"/>
+            <field name="arch" type="xml">
+            	<xpath expr="//filter[@string='Order Month']" position="replace">
+                	<filter string="By Day" icon="terp-go-month" domain="[]" context="{'group_by':'date_order:day'}"/>
+                	<filter string="By Month" icon="terp-go-month" domain="[]" context="{'group_by':'date_order:monthh'}"/>
+                </xpath>                
+            </field>
+        </record>
         
         <record id="op_pos_order_action" model="ir.actions.act_window">
             <field name="name">POS Orders</field>
             <field name="res_model">pos.order</field>
-            <field name="view_mode">tree,form</field>           
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_opensession_filter":1}</field>
         </record>
         <menuitem action="op_pos_order_action" id="menu_op_pos_orders" 
         	parent="menu_operation_pos"  sequence="1" />
         	
+        <record model="ir.ui.view" id="view_pos_session_search">
+            <field name="name">pos.session.search.view</field>
+            <field name="model">pos.session</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_session_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@string='Open']" position="replace">
+                	<filter string="Open Session" domain="[('state', '=', 'opened')]" name="opensession_filter" />
+                </xpath>
+            </field>
+        </record>
+        	
         <record id="op_pos_session_action" model="ir.actions.act_window">
             <field name="name">Session</field>
             <field name="res_model">pos.session</field>
-            <field name="view_mode">tree,form</field>           
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_opensession_filter":1}</field>     
         </record>
         <menuitem action="op_pos_session_action" id="menu_op_pos_sessions" 
-        	parent="menu_operation_pos"  sequence="1" groups="group_pos_admin"/>	
-        
-        
-        <record id="op_purchase_order_action" model="ir.actions.act_window">
-            <field name="name">Purchase Orders</field>
-            <field name="res_model">purchase.order</field>
-            <field name="view_mode">tree,form</field>           
-        </record>
-        <menuitem action="op_purchase_order_action" id="menu_op_purchase_orders" 
-        	parent="menu_operation_procurement"  sequence="1" groups="group_pos_admin"/>
-        
-        <menuitem action="stock.action_picking_type_form" id="menu_op_stock_operation" 
-        	parent="menu_operation_stock"  sequence="1" groups="group_pos_admin"/>
-        
-        <menuitem action="account.action_account_partner_ledger" id="menu_op_partner_ledger" 
-        	parent="account.menu_finance_reporting"  sequence="1" groups="group_pos_admin"/>
-        
-        
-        <menuitem action="account.action_invoice_tree2" id="menu_op_supplier_invoices" 
-        	parent="menu_operation_payment"  sequence="1" groups="group_pos_admin"/>
-        
-        
-        <menuitem action="account_voucher.action_vendor_payment" id="menu_op_supplier_payments" 
-        	parent="menu_operation_payment"  sequence="1" groups="group_pos_admin"/>
+        	parent="menu_operation_pos"  sequence="1" groups="group_pos_admin"/>
         
     </data>
 </openerp>

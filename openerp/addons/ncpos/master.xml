@@ -4,7 +4,6 @@
         <!-- Top menu item -->
         <menuitem name="Master Data" id="menu_pos_master_root" groups="group_pos_admin" />
         	<menuitem name="Products" id="menu_pos_backoffice_products" parent="menu_pos_master_root" sequence="15" groups="group_pos_admin" />
-        	<menuitem name="Settings" id="menu_pos_backoffice_settings" parent="menu_pos_master_root" sequence="15" groups="group_pos_admin" />
         
         <record id="pos_product_tree_view" model="ir.ui.view">
             <field name="name">pos.product.tree</field>
@@ -193,112 +192,5 @@
         
         <menuitem action="pos_product_uom_manage_action" id="menu_manage_product_uom" parent="menu_pos_backoffice_products" sequence="2" groups="group_pos_admin"/>
         
-        <record id="pos_view_users_form" model="ir.ui.view">
-            <field name="name">pos.res.users.form</field>
-            <field name="model">res.users</field>
-            <field name="arch" type="xml">
-                <form string="Users">
-                    <sheet>                     
-                        
-                        <field name="image" widget='image' class="oe_avatar oe_left" options='{"preview_image": "image_medium"}'/>
-                        <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
-                            <h1><field name="name"/></h1>                            
-                            <label for="login" class="oe_edit_only" string="Email Address"/>
-                            <h2><field name="login" on_change="on_change_login(login)"/></h2>
-                            <label for="company_id" class="oe_edit_only" groups="base.group_multi_company"/>
-                            <field name="company_id" context="{'user_preference': 0}" groups="base.group_multi_company"/>
-                            <group>
-                                <field name="partner_id" readonly="1" required="0" groups="base.group_no_one"
-                                        attrs="{'invisible': [('id', '=', False)]}"/>
-                                <field name="active"/>
-                            </group>
-                        </div>
-                        <notebook colspan="4">
-                            <page string="Access Rights">
-                                <group string="Allowed Companies" groups="base.group_multi_company">
-                                    <field name="company_ids" nolabel="1" widget="many2many_tags"/>
-                                </group>
-                                <group col="4">
-                                    <field name="groups_id" groups="base.group_system"/>
-                                </group>
-                            </page>
-                            <page string="Preferences">
-                                <group>
-                                    <group string="Localization" name="preferences">
-                                        <field name="lang"/>
-                                        <field name="tz"/>
-                                    </group>                                    
-                                </group>
-                                <group string="Point of Sale">
-	                                <field name="pos_config" required="1" />                              
-	                            </group>	                            
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-        
-        <record id="pos_res_user_manage_action" model="ir.actions.act_window">
-            <field name="name">Sale Users</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.users</field>            
-            <field name="view_mode">tree,form</field>
-        </record>        
-        
-        <record model="ir.actions.act_window.view" id="act_pos_user_tree_view">
-		    <field eval="1" name="sequence"/>
-		    <field name="view_mode">tree</field>
-		    <field name="act_window_id" ref="pos_res_user_manage_action"/>
-		</record>
-        <record model="ir.actions.act_window.view" id="act_pos_user_form_view">
-        	<field eval="2" name="sequence"/>
-		    <field name="view_mode">form</field>
-		    <field name="view_id" ref="pos_view_users_form"/>
-		    <field name="act_window_id" ref="pos_res_user_manage_action"/>
-		</record>
-		
-        <menuitem action="pos_res_user_manage_action" id="menu_manage_res_users" parent="menu_pos_backoffice_settings" sequence="2" groups="group_pos_admin"/>
-        
-        <record id="pos_pos_config_manage_action" model="ir.actions.act_window">
-            <field name="name">POS Machine</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">pos.config</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>  
-        <menuitem action="pos_pos_config_manage_action" id="menu_manage_pos_configs" parent="menu_pos_backoffice_settings" sequence="3" groups="group_pos_admin"/>
-        
-        <record id="pos_stock_location_manage_action" model="ir.actions.act_window">
-            <field name="name">Stock Location</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">stock.location</field>
-            <field name="view_type">form</field>
-            <field name="domain">[('usage','=','internal')]</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        
-        <menuitem action="pos_stock_location_manage_action" id="menu_manage_stock_locations" parent="menu_pos_backoffice_settings" sequence="4" groups="group_pos_admin"/>
-        
-        <record id="pos_account_journal_manage_action" model="ir.actions.act_window">
-            <field name="name">Payment Methods</field>
-            <field name="res_model">account.journal</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('type', 'in', ['bank', 'cash'])]</field>         
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to add a payment method.
-              </p><p>
-                Payment methods are defined by accounting journals having the
-                field <i>PoS Payment Method</i> checked. In order to be useable
-                from the touchscreen interface, you must set the payment method
-                on the <i>Point of Sale</i> configuration.
-              </p>
-            </field>
-        </record>
-
-        <menuitem action="pos_account_journal_manage_action" id="menu_manage_account_journals" parent="menu_pos_backoffice_settings"  sequence="5" groups="group_pos_admin"/>
     </data>
 </openerp>

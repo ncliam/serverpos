@@ -20,12 +20,52 @@
 ##############################################################################
 
 import time
+from openerp import SUPERUSER_ID
 from openerp.osv import fields, osv
 from openerp.tools import float_is_zero
 from openerp.tools.translate import _
 import base64
 import openerp.addons.decimal_precision as dp
 
+class pos_session(osv.osv):
+    _inherit = 'pos.session'
+    
+    def wkf_action_open(self, cr, uid, ids, context=None):
+        # second browse because we need to refetch the data from the DB for cash_register_id
+        for record in self.browse(cr, uid, ids, context=context):
+            values = {}
+            if not record.start_at:
+                values['start_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
+            values['state'] = 'opened'
+            record.write(values)
+            for st in record.statement_ids:
+                st.button_open()
+
+        return self.open_frontend_cb(cr, uid, ids, context=context)
+    
+    def open_frontend_cb(self, cr, uid, ids, context=None):
+        if not context:
+            context = {}
+        if not ids:
+            return {}
+        
+        force_by_admin = False
+        for session in self.browse(cr, uid, ids, context=context):
+            if session.user_id.id != uid:
+                if (uid == SUPERUSER_ID):
+                    force_by_admin = True
+                    continue;
+                raise osv.except_osv(
+                        _('Error!'),
+                        _("You cannot use the session of another users. This session is owned by %s. Please first close this one to use this point of sale." % session.user_id.name))
+        context.update({'active_id': ids[0]})
+        if force_by_admin:
+            return;
+        return {
+            'type' : 'ir.actions.act_url',
+            'target': 'self',
+            'url':   '/pos/web/',
+        }
 
 class pos_order(osv.osv):
     _inherit = "pos.order"
@@ -76,6 +116,9 @@ class pos_order(osv.osv):
         return order_id
 
     def create_from_mobility(self, cr, uid, orders, context=None):
+        if context is None:
+            context = {}
+        context = {'create_from_mobility': True}
         order_ids = []
         for tmp_order in orders:
             
@@ -99,26 +142,28 @@ class pos_order(osv.osv):
     def report_sale_details(self, cr, uid, ids, report_name, html=None, data=None, context=None):
         content = self.pool['report'].get_pdf(cr, uid, ids, report_name, html=html, data=data, context=context)
         return base64.encodestring(content)
+    
+    
 
 class pos_order_line(osv.osv):
     _inherit = "pos.order.line"
     
     _columns = {        
         'description': fields.char('Description', required=False, copy=False, state={'draft': [('readonly', False)]}, readonly=True),
-        'uos_qty': fields.float('Quantity (UoS)' ,digits_compute= dp.get_precision('Product UoS'), state={'draft': [('readonly', False)]}, readonly=True),
-        'uos': fields.many2one('product.uom', 'Product UoS', state={'draft': [('readonly', False)]}, readonly=True),
+        'uos': fields.many2one('product.uom', 'Product UoS', state={'draft': [('readonly', False)]}, readonly=True),        
+        'uos_qty': fields.float('Quantity (UOS)', digits_compute=dp.get_precision('Product UoS')),
+        'uos_price_unit': fields.float(string='Unit Price (UOS)', digits_compute=dp.get_precision('Product Price')),
     }
     
     def create(self, cr, uid, values, context=None):
-        if (not values.has_key("qty")):
-            values.update({
-                'qty': values.get('uos_qty'),
-            })
-        newId = super(pos_order_line, self).create(cr, uid, values, context=context)
-        line = self.browse(cr, uid, newId, context=context)
-        qty = self.pool.get('product.uom')._compute_qty(cr, uid, line.uos.id, line.uos_qty, line.product_id.uom_id.id)
-        self.write(cr, uid, [newId], {'qty': qty})
-        return newId
-
+        if context is None:
+            context = {}
+        if context.has_key('create_from_mobility'):
+            uos_id = values['uos']
+            uos = self.pool.get('product.uom').browse(cr, uid, uos_id, context=context)
+            values['qty'] = values['uos_qty'] * uos.factor_inv
+            values['price_unit'] = (values['uos_qty'] * values['uos_price_unit']) / values['qty']            
+            
+        return super(pos_order_line, self).create(cr, uid, values, context=context)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

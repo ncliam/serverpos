@@ -19,6 +19,7 @@
 #
 ##############################################################################
 
+import datetime
 import random
 import openerp
 from openerp import SUPERUSER_ID
@@ -77,6 +78,54 @@ class pos_registration(osv.osv):
     _defaults = {        
         'state': 'draft',
     }
+    
+    @api.cr_uid
+    def send_daily_sales_email(self, cr, uid, ids=None, context=None):
+        if context is None:
+            context = {}
+        if not ids:
+            filters = [('state', '=', 'approved')]
+            if 'filters' in context:
+                filters.extend(context['filters'])
+            ids = self.search(cr, uid, filters, context=context)
+        mail_mail_obj = self.pool.get('mail.mail')
+        pos_obj = self.pool.get('pos.order')
+        current_date = datetime.date.today()
+        for reg in self.browse(cr, uid, ids, context=context):
+            if reg.state == 'approved':
+                if reg.user_id and reg.user_id.partner_id and reg.user_id.partner_id.email:
+                    email = reg.user_id.partner_id.email
+                    # Send email to this account
+                    today = current_date.strftime("%Y-%m-%d")
+                    data = {
+                        'form' : {
+                        'date_start': today,
+                        'date_end': today,
+                        'user_ids': None, 
+                        }                  
+                    }
+                    
+                    pos_ids = pos_obj.search(cr, reg.user_id.id, [])
+                    if pos_ids and len(pos_ids) > 0:
+                        contentHTML = self.pool['report'].get_html(cr, uid, ids=pos_ids, report_name='point_of_sale.report_detailsofsales', data=data, context=context)                    
+                        values = {
+                            'model': None,
+                            'res_id': None,
+                            'subject': _('MedicPOS - Daily Sale Report'),
+                            'body': None,
+                            'body_html': contentHTML,
+                            'parent_id': None,
+                            'partner_ids': None,
+                            'notified_partner_ids': None,
+                            'attachment_ids': None,
+                            'email_from': "admin@multimex.com.vn",
+                            'email_to': email,
+                        }
+                        mail_id = mail_mail_obj.create(cr, uid, values, context=context)
+                        mail_mail_obj.send(cr, uid, [mail_id], context=context)
+                    
+        # do somthing else
+        return
     
     def action_aprrove(self, cr, uid, ids, context=None):
         
@@ -191,10 +240,11 @@ class pos_registration(osv.osv):
             if not user.pos_config:
                 payment_ids = []
                 payment_ids.append(cash_journal_id)
-                payment_ids.append(bank_journal_id)
+                payment_ids.append(bank_journal_id)                
                 pricelist_id = self.pool.get('product.pricelist').create(cr, uid, {
                                                                             'name': _('Pricelist [%s]') % reg.name,
                                                                             'company_id': company_id,
+                                                                            'type': 'sale',
                                                                             'currency_id': reg.currency_id and reg.currency_id.id or False,
                                                                         }, context=context)
                 pos_config_data = {
