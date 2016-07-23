@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="default_logo_module" model="ir.config_parameter">
+            <field name="key">theme_ncpos.default_logo_module</field>
+            <field name="value">theme_ncpos</field>
+        </record>
+    </data>
+</openerp>

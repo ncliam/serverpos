@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="product_category_list_view" model="ir.ui.view">
+            <field name="name">product.category.list</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_list_view"/>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <field name="complete_name" position="after">
+                	<field name="company_id" groups="base.group_multi_company" widget="selection"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="product_category_form_view" model="ir.ui.view">
+            <field name="name">product.category.form</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <field name="type" position="after">
+                	<field name="company_id" groups="base.group_multi_company" widget="selection"/>
+                </field>
+            </field>
+        </record>
+        
+         <record id="product_category_search_view" model="ir.ui.view">
+            <field name="name">product.category.search</field>
+            <field name="model">product.category</field>            
+            <field name="inherit_id" ref="product.product_category_search_view"/>
+            <field name="arch" type="xml">
+                <field name="parent_id" position="after">
+                	<group  expand='0' string='Group by...'>
+                       <filter string="Company" groups="base.group_multi_company" context="{'group_by':'company_id'}"/>                    
+                    </group>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
