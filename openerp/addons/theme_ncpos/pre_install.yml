@@ -1,3 +1,0 @@
--
-  !python {model: ir.translation}: |
-    self._get_source.clear_cache(self)
