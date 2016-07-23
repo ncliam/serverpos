@@ -9,7 +9,7 @@ function openerp_pos_uom(instance,module){
 		// Change Unit of Sale
 		change_uos: function(unit_id) {		
 			//update unit and unit price
-			this.default_uom = this.product.uom_id;
+			this.default_uom = this.pos.units_by_id[this.product.uom_id[0]];
 			this.uos_id = this.pos.units_by_id[unit_id];
 			this.trigger('change',this);
 		},
@@ -35,9 +35,7 @@ function openerp_pos_uom(instance,module){
         get_unit_price: function(){
             var unit_price = round_di(this.price || 0, this.pos.dp['Product Price']);
             if (this.uos_id && this.default_uom && this.uos_id.id != this.default_uom.id) {
-            	if (this.uos_id.uom_type != "reference") {
-            		unit_price = unit_price * this.uos_id.factor_inv;
-            	}
+            	unit_price = unit_price * this.uos_id.factor_inv * this.default_uom.factor;
             }
             return unit_price;
         },
