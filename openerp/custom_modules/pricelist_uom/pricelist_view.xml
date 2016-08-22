@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="product_pricelist_item_form_view" model="ir.ui.view">
+            <field name="name">product.pricelist.item.form</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+            <field name="arch" type="xml">
+            	<field name="product_tmpl_id" position="after">
+            		<field name="uom_id" 
+            			attrs="{'invisible': [('product_id','=',False), ('product_tmpl_id','==',False)]}" />
+            	</field>
+            </field>
+        </record>
+        
+        <record id="product_template_form_view" model="ir.ui.view">
+            <field name="name">product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="priority">5</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+            	<field name="uom_id" position="after" >
+            		<field name="uom_ids" widget="many2many_tags" options="{'no_create_edit': True}" />
+            	</field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

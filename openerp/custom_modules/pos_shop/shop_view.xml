@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	
+    	<record model="ir.ui.view" id="view_pos_shop_form">
+            <field name="name">pos.shop.form.view</field>
+            <field name="model">pos.shop</field>
+            <field name="arch" type="xml">
+                <form string="Retail Shop">
+                    <header>                        
+                        <div class="oe_right">                            
+                        </div>
+                    </header>
+
+                    <sheet>
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <group col="4">
+                        	<field name="company_id" groups="base.group_multi_company"/>                    
+                            <field name="stock_location_id" groups="stock.group_locations"/>                            
+                            <field name="pricelist_id" groups="product.group_sale_pricelist"/>
+                            <field name="journal_id" widget="selection"/>
+                            <field name="currency_id" />
+                        </group>
+                        
+                        <separator string="Available Devices" colspan="4"/>
+                        <field name="config_ids" colspan="4" nolabel="1" >
+                            <tree string="Devices">
+                                <field name="name" />
+                            </tree>
+                        </field>
+                        
+                        <group string="Receipt" >
+                            <field name="address" />
+                            <field name="hotline" />
+                            <field name="email" />
+                        </group>
+                        
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+    	
+    	<record model="ir.ui.view" id="view_pos_shop_tree">
+            <field name="name">pos.shop.tree.view</field>
+            <field name="model">pos.shop</field>
+            <field name="arch" type="xml">
+                <tree string="Retail Shop">
+                    <field name="name" />
+                    <field name="address" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="stock_location_id" groups="stock.group_locations"/>
+                    <field name="pricelist_id" groups="product.group_sale_pricelist" />                    
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_pos_shop_search">
+            <field name="name">pos.shop.search.view</field>
+            <field name="model">pos.shop</field>
+            <field name="arch" type="xml">
+                <search string="Retail Shop">
+                    <field name="name" />
+                    <field name="address" />
+                    
+                    <field name="stock_location_id" groups="stock.group_locations" />
+                    <field name="pricelist_id" groups="product.group_sale_pricelist" />
+                </search>
+            </field>
+        </record>
+    
+        <record model="ir.actions.act_window" id="action_pos_shop">
+            <field name="name">Retail Shop</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.shop</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_pos_shop_search" />
+        </record>
+
+        <menuitem
+            parent="point_of_sale.menu_point_config_product"
+            action="action_pos_shop"
+            id="menu_pos_shop"
+            groups="point_of_sale.group_pos_manager"/>
+            
+            
+        <record model="ir.ui.view" id="view_pos_config_form">
+            <field name="name">pos.config.form.view</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
+            <field name="arch" type="xml">
+            	<field name="company_id" position="after">
+            		<field name="shop_id" />
+            	</field>
+            	
+            	<field name="iface_vkeyboard" position="before">
+            		<field name="udi" />
+            	</field>
+            </field>
+        </record>
+            
+    </data>
+</openerp>
