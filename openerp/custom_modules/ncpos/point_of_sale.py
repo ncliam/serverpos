@@ -26,6 +26,7 @@ from openerp.tools import float_is_zero
 from openerp.tools.translate import _
 import base64
 import openerp.addons.decimal_precision as dp
+from openerp.addons.point_of_sale.report.pos_details import pos_details
 
 class pos_session(osv.osv):
     _inherit = 'pos.session'
@@ -142,6 +143,16 @@ class pos_order(osv.osv):
     def report_sale_details(self, cr, uid, ids, report_name, html=None, data=None, context=None):
         content = self.pool['report'].get_pdf(cr, uid, ids, report_name, html=html, data=data, context=context)
         return base64.encodestring(content)
+    
+    def pos_sales_details(self, cr, uid, form):
+        details = pos_details(cr,uid,'Report',{})
+        order_lines = details._pos_sales_details(form)
+        payment_lines = details._get_payments(form)
+        data = {
+            'order_lines': order_lines,
+             'payment_lines': payment_lines
+        }
+        return data
     
     
 
