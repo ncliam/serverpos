@@ -230,7 +230,7 @@ class product_pricelist(osv.osv):
                         price = tools.float_round(price, precision_rounding=rule.price_round)
 
                     convert_to_price_uom = (lambda price: product_uom_obj._compute_price(
-                                                cr, uid, product.uom_id.id,
+                                                cr, uid, qty_uom_id,
                                                 price, price_uom_id))
                     if rule.price_surcharge:
                         price_surcharge = convert_to_price_uom(rule.price_surcharge)
