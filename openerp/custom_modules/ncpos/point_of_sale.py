@@ -20,7 +20,9 @@
 ##############################################################################
 
 import time
-from openerp import SUPERUSER_ID
+import datetime
+from openerp import SUPERUSER_ID, api
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.osv import fields, osv
 from openerp.tools import float_is_zero
 from openerp.tools.translate import _
@@ -176,5 +178,59 @@ class pos_order_line(osv.osv):
             values['price_unit'] = (values['uos_qty'] * values['uos_price_unit']) / values['qty']            
             
         return super(pos_order_line, self).create(cr, uid, values, context=context)
+    
+    
+class stock_production_lot(osv.osv):
+    _inherit = 'stock.production.lot'
+    
+    def onchange_life_date(self, cr, uid, ids, life_date=False, product_id=False, context=None):
+        res = {}
+        if not product_id:
+            return res
+        
+        res['value'] = {
+            #'life_date': _get_date_by_date('life_time', life_date),
+            'use_date': self._get_date_by_date(cr, uid, 'use_time',product_id,  life_date, context=context),
+            'removal_date': self._get_date_by_date(cr, uid, 'removal_time', product_id, life_date, context=context),
+            'alert_date': self._get_date_by_date(cr, uid, 'alert_time', product_id, life_date, context=context),
+        }
+        
+        return res
+    
+    def _get_date_by_date(self, cr, uid, dtype, product_id, import_date=False, context=None):
+        """Return a function to compute the limit date for this type"""
+        date_imported = datetime.datetime.today()
+        if import_date:
+            date_imported = datetime.datetime.strptime(import_date, DEFAULT_SERVER_DATETIME_FORMAT)
+            
+        """Compute the limit date for a given date"""
+        if context is None:
+            context = {}
+        product = self.pool.get('product.product').browse(cr, uid, product_id)
+        duration = getattr(product, dtype)
+        # set date to False when no expiry time specified on the product
+        date = duration and date_imported + datetime.timedelta(days=duration)
+        return date and date.strftime('%Y-%m-%d %H:%M:%S') or False
+    
+    @api.multi
+    def name_get(self):
+        
+        result = []
+        for lot in self:
+            l_name = lot.ref and '[' + lot.ref + '] ' or ''
+            l_name += lot.name            
+            result.append((lot.id, l_name))
+        return result
+    
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        recs = self.browse()
+        if name:
+            recs = self.search([('name', operator, name)] + args, limit=limit)
+        if not recs:
+            recs = self.search([('ref', operator, name)] + args, limit=limit)
+            
+        return recs.name_get()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

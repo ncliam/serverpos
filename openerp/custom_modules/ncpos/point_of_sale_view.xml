@@ -45,5 +45,16 @@
             	</button>
             </field>
         </record>
+        
+        <record model="ir.ui.view" id="view_move_form_expiry">
+            <field name="name">stock.production.lot.form</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="product_expiry.view_move_form_expiry" />
+            <field name="arch" type="xml">
+	            <field name="life_date" position="replace">
+	            	<field name="life_date" on_change="onchange_life_date(life_date, product_id)" />
+	            </field>
+            </field>
+        </record>
     </data>
 </openerp>
