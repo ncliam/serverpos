@@ -1,0 +1,18 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_res_partner_school_admin,res.partner school_admin,base.model_res_partner,school_link.group_school_admin,1,1,1,1
+access_res_partner_school_teacher,res.partner school_teacher,base.model_res_partner,school_link.group_school_teacher,1,0,0,0
+access_res_partner_school_parent,res.partner school_parent,base.model_res_partner,school_link.group_school_parent,1,0,0,0
+
+access_school_scholarity_admin,school.scholarity school_admin,base.model_school_scholarity,school_link.group_school_admin,1,1,1,1
+access_school_scholarity_teacher,school.scholarity school_teacher,base.model_school_scholarity,school_link.group_school_teacher,1,0,0,0
+access_school_scholarity_parent,school.scholarity school_parent,base.model_school_scholarity,school_link.group_school_parent,1,0,0,0
+
+access_school_class_group_admin,school.class.group school_admin,base.model_school_class_group,school_link.group_school_admin,1,1,1,1
+access_school_class_group_teacher,school.class.group school_teacher,base.model_school_class_group,school_link.group_school_teacher,1,0,0,0
+access_school_class_group_parent,school.class.group school_parent,base.model_school_class_group,school_link.group_school_parent,1,0,0,0
+
+access_school_class_admin,school.class school_admin,base.model_school_class,school_link.group_school_admin,1,1,1,1
+access_school_class_teacher,school.class school_teacher,base.model_school_class,school_link.group_school_teacher,1,0,0,0
+access_school_class_parent,school.class school_parent,base.model_school_class,school_link.group_school_parent,1,0,0,0
+
