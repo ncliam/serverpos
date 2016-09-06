@@ -20,7 +20,7 @@
 ##############################################################################
 
 {
-    'name': 'Use for School Link App',
+    'name': 'School Link',
     'version': '1.0.0',
     'category': 'Education',
     'sequence': 6,
@@ -37,7 +37,7 @@ Main Features
 * 
     """,
     'author': 'ncliam',
-    'depends': ['base'],
+    'depends': ['web'],
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',

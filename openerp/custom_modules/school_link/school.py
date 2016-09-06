@@ -77,7 +77,7 @@ class school_class(osv.osv):
         'name': fields.char('Name', required=True),
         'year_id':fields.many2one('school.scholarity', 'Year', required=True),
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
-        'group_id': fields.integer('Sequence', help="Gives the sequence order when displaying a list "),
+        'group_id':fields.many2one('school.class.group', 'Group', required=True),
         'teacher_id':fields.many2one('res.partner', 'Responsible', domain="[('teacher','=',True)]"),
         'student_ids':fields.many2many('res.partner', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
     }

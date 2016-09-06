@@ -1,7 +1,368 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-    	
+        <!-- User company as school -->
+    	<record id="view_company_form" model="ir.ui.view">
+            <field name="name">res.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@string='Configuration']" position="inside">
+                    <group>
+                        <group string="School Link">
+                            <field name="school"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Use partner for actors -->
+        <record id="view_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field eval="1" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='internal_notes']" position="after">
+                    <page name='school_link' string="School Link">
+                        <group>
+                            <field name="student" />
+                            <field name="parent" />
+                            <field name="teacher" />
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- SCHOOL LINK MENU -->
+        <menuitem name="School Link" id="menu_school_link_root" groups="base.group_system" sequence="90"/>
+
+        <!-- CONFIGURATION MENU -->
+        <menuitem id="menu_school_link_configuration" name="Configuration" parent="menu_school_link_root" groups="base.group_system" sequence="50"/>
+
+
+        <!-- SCHOLARITY -->
+        <record id="view_scholarity_tree" model="ir.ui.view">
+            <field name="name">school.scholarity.tree</field>
+            <field name="model">school.scholarity</field>
+            <field name="arch" type="xml">
+                <tree string="Scholarities">
+                    <field name="name"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_scholarity_form" model="ir.ui.view">
+            <field name="name">school.scholarity.form</field>
+            <field name="model">school.scholarity</field>
+            <field name="arch" type="xml">
+                <form string="Scholarity">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group>
+                                    <group>
+                                        <field name="company_id" groups="base.group_multi_company" />
+                                    </group>
+                                    <group string="Effective">
+                                        <field name="date_start" />
+                                        <field name="date_end"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_scholarity_filter" model="ir.ui.view">
+            <field name="name">Scholarity</field>
+            <field name="model">school.scholarity</field>
+            <field name="arch" type="xml">
+                <search string="Scholarities">
+                    <field name="name" string="Name" />
+                    <group expand="0" string="Group By">
+                        <filter string="Company" icon="terp-go-home" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+             </field>
+         </record>
+
+
+        <record id="action_school_scholarity" model="ir.actions.act_window">
+            <field name="name">Scholarity</field>
+            <field name="res_model">school.scholarity</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_scholarity_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new scholarity.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_school_scholarity" id="menu_school_scholarity" sequence="1" parent="menu_school_link_configuration"/>
+
+
+        <!-- SUBJECT -->
+
+        <record id="view_subject_tree" model="ir.ui.view">
+            <field name="name">school.subject.tree</field>
+            <field name="model">school.subject</field>
+            <field name="arch" type="xml">
+                <tree string="Subjects">
+                    <field name="name"/>
+                    <field name="weight"/>
+                    <field name="sequence"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_subject_form" model="ir.ui.view">
+            <field name="name">school.subject.form</field>
+            <field name="model">school.subject</field>
+            <field name="arch" type="xml">
+                <form string="Subject">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group>
+                                    <group>
+                                        <field name="company_id" groups="base.group_multi_company" />
+                                        <field name="weight" />
+                                        <field name="sequence"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_subject_filter" model="ir.ui.view">
+            <field name="name">Subjects</field>
+            <field name="model">school.subject</field>
+            <field name="arch" type="xml">
+                <search string="Subjects">
+                    <field name="name" string="Name" />
+                    <group expand="0" string="Group By">
+                        <filter string="Company" icon="terp-go-home" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+             </field>
+         </record>
+
+
+        <record id="action_school_subject" model="ir.actions.act_window">
+            <field name="name">Subjects</field>
+            <field name="res_model">school.subject</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_subject_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new subject.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_school_subject" id="menu_school_subject" sequence="1" parent="menu_school_link_configuration"/>group
+
+
+        <!-- GROUPS -->
+
+        <record id="view_class_group_tree" model="ir.ui.view">
+            <field name="name">school.class.group.tree</field>
+            <field name="model">school.class.group</field>
+            <field name="arch" type="xml">
+                <tree string="Subjects">
+                    <field name="name"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_class_group_form" model="ir.ui.view">
+            <field name="name">school.class.group.form</field>
+            <field name="model">school.class.group</field>
+            <field name="arch" type="xml">
+                <form string="Class group">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group>
+                                    <group>
+                                        <field name="company_id" groups="base.group_multi_company" />
+                                        <field name="sequence"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_class_group_filter" model="ir.ui.view">
+            <field name="name">Class groups</field>
+            <field name="model">school.class.group</field>
+            <field name="arch" type="xml">
+                <search string="Groups">
+                    <field name="name" string="Name" />
+                    <group expand="0" string="Group By">
+                        <filter string="Company" icon="terp-go-home" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+             </field>
+         </record>
+
+
+        <record id="action_school_class_group" model="ir.actions.act_window">
+            <field name="name">Groups</field>
+            <field name="res_model">school.class.group</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_class_group_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new group.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_school_class_group" id="menu_school_class_group" sequence="1" parent="menu_school_link_configuration"/>
+
+
+        <!-- CLASSES -->
+
+        <record id="view_class_tree" model="ir.ui.view">
+            <field name="name">school.class.tree</field>
+            <field name="model">school.class</field>
+            <field name="arch" type="xml">
+                <tree string="Classes">
+                    <field name="name"/>
+                    <field name="group_id"/>
+                    <field name="year_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_class_form" model="ir.ui.view">
+            <field name="name">school.class.form</field>
+            <field name="model">school.class</field>
+            <field name="arch" type="xml">
+                <form string="Class">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group>
+                                    <group string="General">
+                                        <field name="company_id" groups="base.group_multi_company" />
+                                        <field name="group_id"/>
+                                        <field name="year_id"/>
+                                    </group>
+
+                                </group>
+                            </page>
+                            <page string="Members">
+                                <group>
+                                    <group>
+                                        <field name="teacher_id"/>
+                                        <field name="student_ids"/>
+                                    </group>
+
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_class_filter" model="ir.ui.view">
+            <field name="name">Classes</field>
+            <field name="model">school.class</field>
+            <field name="arch" type="xml">
+                <search string="Classes">
+                    <field name="name" string="Name" />
+                    <group expand="0" string="Group By">
+                        <filter string="Company" icon="terp-go-home" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                        <filter string="Group" icon="terp-go-home" domain="[]" context="{'group_by':'group_id'}" />
+                        <filter string="Year" icon="terp-go-home" domain="[]" context="{'group_by':'year_id'}" />
+                    </group>
+                </search>
+             </field>
+         </record>
+
+
+        <record id="action_school_class" model="ir.actions.act_window">
+            <field name="name">Classes</field>
+            <field name="res_model">school.class</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_class_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new class.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_school_class" id="menu_school_class" sequence="1" parent="menu_school_link_configuration"/>
             
     </data>
 </openerp>
