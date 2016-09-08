@@ -34,9 +34,13 @@ class res_partner(osv.osv):
     _inherit = 'res.partner'
     
     _columns = {
-        'student': fields.boolean('Student'),
-        'parent': fields.boolean('Parent'),
-        'teacher': fields.boolean('Teacher'),        
+        'student': fields.boolean('Is a Student'),
+        'parent': fields.boolean('Is a Parent'),
+        'teacher': fields.boolean('Is a Teacher'),
+        'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'parent_id', 'student_id', 'Parents',
+                                        domain="[('parent','=',True)]"),
+        'child_ids': fields.many2many('res.partner', 'student_parent_rel', 'student_id', 'parent_id', 'Childs',
+                                       domain="[('student','=',True)]"),
     }
 
 
@@ -82,3 +86,46 @@ class school_class(osv.osv):
         'student_ids':fields.many2many('res.partner', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
     }
     
+class school_exam(osv.osv):
+    _name = 'school.exam'
+
+    _columns = {
+        'name': fields.char('Name', required=True),
+        'state': fields.selection([
+            ('draft', 'Draft Exam'),
+            ('done', 'Done'),
+        ], 'Status', readonly=True, copy=False, help="Gives the status of exam", select=True),
+        'date_exam': fields.datetime('Date', required=True, readonly=True, select=True,
+                                      states={'draft': [('readonly', False)]}, copy=False),
+        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
+        'class_id': fields.many2one('school.class', 'Class', required=True),
+        'weight': fields.integer('Weight', help="Define weight to calculate average"),
+        'exam_line': fields.one2many('school.exam.line', 'exam_id', 'Exam Lines', readonly=True,
+                                      states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                      copy=True),
+
+    }
+
+class school_exam_line(osv.osv):
+    _name = 'school.exam.line'
+
+    _columns = {
+        'exam_id': fields.many2one('school.exam', 'Exam Ref', required=True, ondelete='cascade', select=True,
+                                    readonly=True, states={'draft': [('readonly', False)]}),
+        'name': fields.char('Name', required=True),
+        'student_id': fields.many2one('res.partner', 'Student', domain=[('student', '=', True)],
+                                      change_default=True, readonly=True, states={'draft': [('readonly', False)]},
+                                      ondelete='restrict'),
+        'mark': fields.float('Mark', readonly=True, states={'draft': [('readonly', False)]}),
+
+         'state': fields.selection([
+            ('draft', 'Draft Exam'),
+            ('done', 'Done'),
+        ], 'Status', readonly=True, copy=False, help="Gives the status of exam", select=True),
+        'date_exam': fields.datetime('Date', required=True, readonly=True, select=True,
+                                      states={'draft': [('readonly', False)]}, copy=False),
+        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
+        'class_id': fields.many2one('school.class', 'Class', required=True),
+        'weight': fields.integer('Weight', help="Define weight to calculate average"),
+
+    }

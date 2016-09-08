@@ -30,6 +30,9 @@
                             <field name="student" />
                             <field name="parent" />
                             <field name="teacher" />
+
+                            <field name="parent_ids" attrs="{'invisible': [('student','!=', True)] }" />
+                            <field name="child_ids" attrs="{'invisible': [('parent','!=', True)] }" />
                         </group>
                     </page>
                 </xpath>
@@ -37,10 +40,11 @@
         </record>
 
         <!-- SCHOOL LINK MENU -->
-        <menuitem name="School Link" id="menu_school_link_root" groups="base.group_system" sequence="90"/>
+        <menuitem name="School Link" id="menu_school_link_root" groups="group_school_super_admin,group_school_admin,group_school_teacher,group_school_teacher" />
 
-        <!-- CONFIGURATION MENU -->
-        <menuitem id="menu_school_link_configuration" name="Configuration" parent="menu_school_link_root" groups="base.group_system" sequence="50"/>
+        <menuitem id="menu_school_link_configuration" name="System Admin" parent="menu_school_link_root" groups="group_school_super_admin" sequence="3"/>
+        <menuitem id="menu_school_link_admin" name="School Admin" parent="menu_school_link_root" groups="group_school_admin" sequence="2"/>
+        <menuitem id="menu_school_link_teacher" name="School Teacher" parent="menu_school_link_root" groups="group_school_teacher" sequence="2"/>
 
 
         <!-- SCHOLARITY -->
@@ -119,7 +123,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_school_scholarity" id="menu_school_scholarity" sequence="1" parent="menu_school_link_configuration"/>
+        <menuitem action="action_school_scholarity" id="menu_school_scholarity" sequence="1" parent="menu_school_link_admin"/>
 
 
         <!-- SUBJECT -->
@@ -197,7 +201,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_school_subject" id="menu_school_subject" sequence="1" parent="menu_school_link_configuration"/>group
+        <menuitem action="action_school_subject" id="menu_school_subject" sequence="1" parent="menu_school_link_admin"/>
 
 
         <!-- GROUPS -->
@@ -272,7 +276,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_school_class_group" id="menu_school_class_group" sequence="1" parent="menu_school_link_configuration"/>
+        <menuitem action="action_school_class_group" id="menu_school_class_group" sequence="1" parent="menu_school_link_admin"/>
 
 
         <!-- CLASSES -->
@@ -362,7 +366,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_school_class" id="menu_school_class" sequence="1" parent="menu_school_link_configuration"/>
+        <menuitem action="action_school_class" id="menu_school_class" sequence="1" parent="menu_school_link_admin"/>
             
     </data>
 </openerp>

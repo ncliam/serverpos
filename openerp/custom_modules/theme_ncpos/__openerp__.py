@@ -18,5 +18,6 @@
     'qweb': [
         'static/src/xml/template.xml',
     ],
-    'installable': True
+    'installable': True,
+    'auto_install': False,
 }
