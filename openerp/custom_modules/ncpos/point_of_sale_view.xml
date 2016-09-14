@@ -31,7 +31,19 @@
             <field name="arch" type="xml">
                 <xpath expr="//tree" position="attributes">
                 	<attribute name="create">false</attribute>
+                    <attribute name="colors">blue:state == 'draft';gray:state in ('done','cancel','failed');black:state not in('done','cancel','failed')</attribute>
                 </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_pos_pos_form">
+            <field name="name">pos.order</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <button name="refund" position="after">
+                	 <button name="mark_failed" string="Mark as failed" type="object" attrs="{'invisible':[('state','!=','draft')]}" />
+                </button>
             </field>
         </record>
         

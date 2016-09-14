@@ -21,7 +21,9 @@
 
 import time
 import datetime
+import logging
 from openerp import SUPERUSER_ID, api
+from openerp import tools
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.osv import fields, osv
 from openerp.tools import float_is_zero
@@ -29,6 +31,7 @@ from openerp.tools.translate import _
 import base64
 import openerp.addons.decimal_precision as dp
 from openerp.addons.point_of_sale.report.pos_details import pos_details
+_logger = logging.getLogger(__name__)
 
 class pos_session(osv.osv):
     _inherit = 'pos.session'
@@ -75,7 +78,31 @@ class pos_order(osv.osv):
     
     _columns = {
         'consumer_email': fields.char('Email of consumer', readonly=True, copy=False),
+        'state': fields.selection([('draft', 'New'),
+                                   ('failed', 'Failed'),
+                                   ('cancel', 'Cancelled'),
+                                   ('paid', 'Paid'),
+                                   ('done', 'Posted'),
+                                   ('invoiced', 'Invoiced')],
+                                  'Status', readonly=True, copy=False),
     }
+
+    def mark_failed(self, cr, uid, ids, context=None):
+        for order in self.browse(cr, uid, ids, context=context):
+            self.write(cr, uid, order.id, {'state': 'failed'}, context=context)
+
+    # Temp fix for empty orders
+    def create(self, cr, uid, values, context=None):
+        if context is None:
+            context = {}
+
+        order_id = super(pos_order, self).create(cr, uid, values, context=context)
+        order_row = self.browse(cr, uid, order_id, context=context)
+        if order_row and order_row.lines and len(order_row) > 0:
+            return order_id
+        else:
+            raise osv.except_osv(_('Error!'), _("POS order is empty"))
+
     
     def _process_mobility_order(self, cr, uid, order, context=None):
                 
@@ -91,7 +118,7 @@ class pos_order(osv.osv):
         
         session = self.pool.get('pos.session').browse(cr, uid, order['pos_session_id'], context=context)  
         # Create new order
-        order_id = self.create(cr, uid, self._order_fields(cr, uid, order, context=context),context)        
+        order_id = self.create(cr, uid, self._order_fields(cr, uid, order, context=context), context)
         
         for payments in order['statement_ids']:
             if ('statement_id' not in payments[2]):
@@ -116,6 +143,7 @@ class pos_order(osv.osv):
                 'payment_name': _('return'),
                 'journal': cash_journal.id,
             }, context=context)
+
         return order_id
 
     def create_from_mobility(self, cr, uid, orders, context=None):
@@ -127,6 +155,15 @@ class pos_order(osv.osv):
             
             to_invoice = tmp_order['to_invoice']
             order = tmp_order['data']
+
+            # FIX failed
+            if order['state'] == "failed":
+                order['state'] = 'draft'
+                if order["id"] > 0:
+                    failed = self.browse(cr, uid, order["id"], context=context)
+                    if failed:
+                        self.unlink(failed.id)
+
             order_id = self._process_mobility_order(cr, uid, order, context=context)
             order_ids.append(order_id)
 
@@ -161,12 +198,14 @@ class pos_order(osv.osv):
 class pos_order_line(osv.osv):
     _inherit = "pos.order.line"
     
-    _columns = {        
+    _columns = {
+        'name': fields.char('Line No', required=False, copy=False),
         'description': fields.char('Description', required=False, copy=False, state={'draft': [('readonly', False)]}, readonly=True),
         'uos': fields.many2one('product.uom', 'Product UoS', state={'draft': [('readonly', False)]}, readonly=True),        
         'uos_qty': fields.float('Quantity (UOS)', digits_compute=dp.get_precision('Product UoS')),
         'uos_price_unit': fields.float(string='Unit Price (UOS)', digits_compute=dp.get_precision('Product Price')),
     }
+
     
     def create(self, cr, uid, values, context=None):
         if context is None:
@@ -175,9 +214,13 @@ class pos_order_line(osv.osv):
             uos_id = values['uos']
             uos = self.pool.get('product.uom').browse(cr, uid, uos_id, context=context)
             values['qty'] = values['uos_qty'] * uos.factor_inv
-            values['price_unit'] = (values['uos_qty'] * values['uos_price_unit']) / values['qty']            
-            
+            values['price_unit'] = (values['uos_qty'] * values['uos_price_unit']) / values['qty']
+
+        if not values.has_key("name") or values['name'] == None:
+            values['name'] = "/"
+
         return super(pos_order_line, self).create(cr, uid, values, context=context)
+
     
     
 class stock_production_lot(osv.osv):
