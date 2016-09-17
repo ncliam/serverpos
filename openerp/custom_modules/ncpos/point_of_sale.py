@@ -213,7 +213,15 @@ class pos_order_line(osv.osv):
         if context.has_key('create_from_mobility'):
             uos_id = values['uos']
             uos = self.pool.get('product.uom').browse(cr, uid, uos_id, context=context)
-            values['qty'] = values['uos_qty'] * uos.factor_inv
+
+            product_id = values['product_id']
+            product = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
+            product_uom = product.uom_id
+
+            values['qty'] = values['uos_qty']
+            if product_uom.id <> uos.id:
+                values['qty'] = values['uos_qty'] * product_uom.factor * uos.factor_inv
+
             values['price_unit'] = (values['uos_qty'] * values['uos_price_unit']) / values['qty']
 
         if not values.has_key("name") or values['name'] == None:
