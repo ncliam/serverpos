@@ -17,22 +17,23 @@
             </field>
         </record>
 
-        <!-- Use partner for actors -->
-        <record id="view_partner_form" model="ir.ui.view">
-            <field name="name">res.partner.form</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field eval="1" name="priority"/>
+        <!--Employee form view -->
+        <record id="view_employee_form" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//page[@name='internal_notes']" position="after">
+                <xpath expr="//page[@string='Personal Information']" position="after">
                     <page name='school_link' string="School Link">
                         <group>
-                            <field name="student" />
-                            <field name="parent" />
-                            <field name="teacher" />
-
-                            <field name="parent_ids" attrs="{'invisible': [('student','!=', True)] }" />
-                            <field name="child_ids" attrs="{'invisible': [('parent','!=', True)] }" />
+                            <field name="last_name"/>
+                            <field name="home_town"/>
+                            <field name="home_address"/>
+                        </group>
+                        <group>
+                            <field name="teacher"/>
+                            <field name="student"/>
+                            <field name="parent_ids" attrs="{'invisible':[('student','=',False)]}" />
                         </group>
                     </page>
                 </xpath>
@@ -367,6 +368,55 @@
             </field>
         </record>
         <menuitem action="action_school_class" id="menu_school_class" sequence="1" parent="menu_school_link_admin"/>
+
+        <record id="action_school_students" model="ir.actions.act_window">
+            <field name="name">Students</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">tree</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('student','=',True)]</field>
+            <field name="context">{'search_default_student': 1,'default_student': 1}</field>
+            <field name="view_id" eval="False"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new student.
+              </p>
+            </field>
+        </record>
+
+        <record id="action_school_teachers" model="ir.actions.act_window">
+            <field name="name">Teachers</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">tree</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('teacher','=',True)]</field>
+            <field name="context">{'search_default_teacher': 1,'default_teacher': 1}</field>
+            <field name="view_id" eval="False"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new teacher.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_school_students" id="menu_school_students" sequence="1" parent="menu_school_link_admin"/>
+        <menuitem action="action_school_teachers" id="menu_school_teacher" sequence="1" parent="menu_school_link_admin"/>
+
+
+        <record id="action_school_parents" model="ir.actions.act_window">
+            <field name="name">Parents</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{"search_default_customer":1}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a parent contact
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="action_school_parents" id="menu_school_parent" sequence="1" parent="menu_school_link_admin"/>
             
     </data>
 </openerp>

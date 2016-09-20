@@ -29,20 +29,25 @@ class res_company(osv.osv):
     _columns = {
         'school': fields.boolean('School'),
     }
-    
-class res_partner(osv.osv):
-    _inherit = 'res.partner'
-    
+
+class hr_employee(osv.osv):
+    _inherit = "hr.employee"
+
     _columns = {
-        'student': fields.boolean('Is a Student'),
-        'parent': fields.boolean('Is a Parent'),
+        'last_name': fields.char('Last Name'),
+        'home_town': fields.char('Home town'),
+        'home_address': fields.char('Home Address'),
         'teacher': fields.boolean('Is a Teacher'),
-        'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'parent_id', 'student_id', 'Parents',
-                                        domain="[('parent','=',True)]"),
-        'child_ids': fields.many2many('res.partner', 'student_parent_rel', 'student_id', 'parent_id', 'Childs',
-                                       domain="[('student','=',True)]"),
+        'student': fields.boolean('Is a Student'),
+        'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'partner_id', 'student_id', 'Parents'),
+
     }
 
+    def create(self, cr, uid, values, context=None):
+        if context is None:
+            context = {}
+        context = dict(context, mail_create_nosubscribe=True)
+        return super(hr_employee, self).create(cr, uid, values, context=context)
 
 class school_scholarity(osv.osv):
     _name = 'school.scholarity'
@@ -52,7 +57,7 @@ class school_scholarity(osv.osv):
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
         'date_start': fields.datetime('Start Date', required=True),
         'date_end': fields.datetime('End Date', required=True),
-    }   
+    }
     
     
 class school_class_group(osv.osv):
@@ -82,8 +87,8 @@ class school_class(osv.osv):
         'year_id':fields.many2one('school.scholarity', 'Year', required=True),
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
         'group_id':fields.many2one('school.class.group', 'Group', required=True),
-        'teacher_id':fields.many2one('res.partner', 'Responsible', domain="[('teacher','=',True)]"),
-        'student_ids':fields.many2many('res.partner', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
+        'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]"),
+        'student_ids':fields.many2many('hr.employee', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
     }
     
 class school_exam(osv.osv):
@@ -113,7 +118,7 @@ class school_exam_line(osv.osv):
         'exam_id': fields.many2one('school.exam', 'Exam Ref', required=True, ondelete='cascade', select=True,
                                     readonly=True, states={'draft': [('readonly', False)]}),
         'name': fields.char('Name', required=True),
-        'student_id': fields.many2one('res.partner', 'Student', domain=[('student', '=', True)],
+        'student_id': fields.many2one('hr.employee', 'Student', domain=[('student', '=', True)],
                                       change_default=True, readonly=True, states={'draft': [('readonly', False)]},
                                       ondelete='restrict'),
         'mark': fields.float('Mark', readonly=True, states={'draft': [('readonly', False)]}),

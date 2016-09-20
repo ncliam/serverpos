@@ -37,7 +37,7 @@ Main Features
 * 
     """,
     'author': 'ncliam',
-    'depends': ['web'],
+    'depends': ['hr', 'im_chat'],
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',
