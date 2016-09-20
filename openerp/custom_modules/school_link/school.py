@@ -21,7 +21,81 @@
 
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
+from openerp import SUPERUSER_ID
+import datetime
 
+class res_user(osv.osv):
+    _inherit = 'res.users'
+
+    def _get_schools(self, cr, uid, context=None):
+
+        school_ids = []
+        res_user = self.pool.get('res.users')
+        res_partner = self.pool.get('res.partner')
+
+        user_id = res_user.browse(cr, uid, uid, context=context)
+        if user_id.partner_id and user_id.partner_id.mobile:
+            mobile = user_id.partner_id.mobile
+            partner_ids = res_partner.search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)],
+                                             context=context)
+            if (partner_ids):
+                for partner_id in partner_ids:
+                    partner = res_partner.browse(cr, SUPERUSER_ID, partner_id, context=context)
+                    if partner and partner.company_id and partner.company_id.school:
+                        school_ids.append(partner.company_id.id)
+
+        return school_ids
+
+    def select_school(self, cr, uid, school=None, context=None):
+        if school:
+            company_id = self.pool.get('res.company').browse(cr, SUPERUSER_ID, school, context=context)
+            if company_id:
+                user_data = {
+                    'company_ids': [(6, 0, [company_id.id])],
+                }
+                self.pool.get("res.users").write(cr, SUPERUSER_ID, uid, user_data, context=context)
+
+        else:
+            raise osv.except_osv(_('error!'), _("Invalid school selected"))
+
+
+    def get_children(self, cr, uid, school=None, context=None):
+        childs = []
+        if school == None:
+            schools = self.get_schools(cr, uid, context=context)
+            if schools and len(school) > 0:
+                school == schools[0]
+
+        user_id = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+        if user_id.partner_id and user_id.partner_id.mobile:
+            mobile = user_id.partner_id.mobile
+            partner_ids = self.pool.get('res_partner').search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)], ('company_id', '=', school), context=context)
+            if (partner_ids):
+                for partner_id in partner_ids:
+                    if partner_id.children:
+                        childs.append(partner_id.children)
+
+        return childs
+
+
+    def get_relate_schools(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for user_id in self.browse(cr, uid, ids, context=context):
+            res[user_id.id] = self._get_schools(cr, user_id.id, context=context)
+        return res
+
+    _columns = {
+        'school_ids': fields.function(get_relate_schools, relation='res.company', type='many2many',
+                                           string='Related Schools', readonly=True),
+    }
+
+
+class res_partner(osv.osv):
+    _inherit = 'res.partner'
+
+    _columns = {
+        'children': fields.many2many('hr.employee', 'parent_student_rel', 'student_id', 'partner_id', 'Childs', readonly=True),
+    }
 
 class res_company(osv.osv):
     _inherit = 'res.company'
@@ -67,18 +141,37 @@ class school_scholarity(osv.osv):
         if not company_id:
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
-    
+
+
+    def _is_active(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        now = datetime.datetime.now()
+        for scholarity in self.browse(cr, uid, ids, context=context):
+            res[scholarity.id] = True
+            if scholarity.date_start:
+                ds = datetime.datetime.strptime(scholarity.date_start, '%Y-%m-%d %H:%M:%S')
+                if ds > now:
+                    res[scholarity.id] = False
+
+            if scholarity.date_end:
+                de = datetime.datetime.strptime(scholarity.date_end, '%Y-%m-%d %H:%M:%S')
+                if de < now:
+                    res[scholarity.id] = False
+
+
+        return res
+
     _columns = {
         'name': fields.char('Scholarity Year', required=True),
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
         'date_start': fields.datetime('Start Date', required=True),
         'date_end': fields.datetime('End Date', required=True),
+        'active': fields.function(_is_active, store=False, string='Active', type='boolean'),
     }
 
     _defaults = {
         'company_id': _get_default_company,
     }
-    
     
 class school_class_group(osv.osv):
     _name = 'school.class.group'
@@ -135,6 +228,7 @@ class school_class(osv.osv):
         'group_id':fields.many2one('school.class.group', 'Group', required=True),
         'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]"),
         'student_ids':fields.many2many('hr.employee', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
+        'active': fields.related('year_id', 'active', type='boolean', string='Active'),
     }
 
     _defaults = {
