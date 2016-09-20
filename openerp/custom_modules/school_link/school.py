@@ -30,8 +30,15 @@ class res_company(osv.osv):
         'school': fields.boolean('School'),
     }
 
+
 class hr_employee(osv.osv):
     _inherit = "hr.employee"
+
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
 
     _columns = {
         'last_name': fields.char('Last Name'),
@@ -40,7 +47,10 @@ class hr_employee(osv.osv):
         'teacher': fields.boolean('Is a Teacher'),
         'student': fields.boolean('Is a Student'),
         'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'partner_id', 'student_id', 'Parents'),
+    }
 
+    _defaults = {
+        'company_id': _get_default_company,
     }
 
     def create(self, cr, uid, values, context=None):
@@ -51,6 +61,12 @@ class hr_employee(osv.osv):
 
 class school_scholarity(osv.osv):
     _name = 'school.scholarity'
+
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
     
     _columns = {
         'name': fields.char('Scholarity Year', required=True),
@@ -58,19 +74,39 @@ class school_scholarity(osv.osv):
         'date_start': fields.datetime('Start Date', required=True),
         'date_end': fields.datetime('End Date', required=True),
     }
+
+    _defaults = {
+        'company_id': _get_default_company,
+    }
     
     
 class school_class_group(osv.osv):
     _name = 'school.class.group'
+
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
     
     _columns = {
         'name': fields.char('Name', required=True),
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
         'sequence': fields.integer('Sequence', help="Gives the sequence order when displaying a list "),  
     }
+
+    _defaults = {
+        'company_id': _get_default_company,
+    }
     
 class school_subject(osv.osv):
     _name = 'school.subject'
+
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
     
     _columns = {
         'name': fields.char('Name', required=True),
@@ -79,8 +115,18 @@ class school_subject(osv.osv):
         'sequence': fields.integer('Sequence', help="Gives the sequence order when displaying a list "),  
     }
 
+    _defaults = {
+        'company_id': _get_default_company,
+    }
+
 class school_class(osv.osv):
     _name = 'school.class'
+
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
     
     _columns = {
         'name': fields.char('Name', required=True),
@@ -90,47 +136,30 @@ class school_class(osv.osv):
         'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]"),
         'student_ids':fields.many2many('hr.employee', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
     }
-    
-class school_exam(osv.osv):
-    _name = 'school.exam'
 
-    _columns = {
-        'name': fields.char('Name', required=True),
-        'state': fields.selection([
-            ('draft', 'Draft Exam'),
-            ('done', 'Done'),
-        ], 'Status', readonly=True, copy=False, help="Gives the status of exam", select=True),
-        'date_exam': fields.datetime('Date', required=True, readonly=True, select=True,
-                                      states={'draft': [('readonly', False)]}, copy=False),
-        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
-        'class_id': fields.many2one('school.class', 'Class', required=True),
-        'weight': fields.integer('Weight', help="Define weight to calculate average"),
-        'exam_line': fields.one2many('school.exam.line', 'exam_id', 'Exam Lines', readonly=True,
-                                      states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                      copy=True),
-
+    _defaults = {
+        'company_id': _get_default_company,
     }
+    
 
-class school_exam_line(osv.osv):
-    _name = 'school.exam.line'
+class school_exam_move(osv.osv):
+    _name = 'school.exam.move'
 
     _columns = {
-        'exam_id': fields.many2one('school.exam', 'Exam Ref', required=True, ondelete='cascade', select=True,
-                                    readonly=True, states={'draft': [('readonly', False)]}),
+        'class_id': fields.many2one('school.class', 'Class', required=True),
+        'user_id': fields.many2one('res.users', 'Teacher', required=True),
         'name': fields.char('Name', required=True),
         'student_id': fields.many2one('hr.employee', 'Student', domain=[('student', '=', True)],
                                       change_default=True, readonly=True, states={'draft': [('readonly', False)]},
                                       ondelete='restrict'),
         'mark': fields.float('Mark', readonly=True, states={'draft': [('readonly', False)]}),
 
-         'state': fields.selection([
-            ('draft', 'Draft Exam'),
-            ('done', 'Done'),
-        ], 'Status', readonly=True, copy=False, help="Gives the status of exam", select=True),
         'date_exam': fields.datetime('Date', required=True, readonly=True, select=True,
                                       states={'draft': [('readonly', False)]}, copy=False),
         'subject_id': fields.many2one('school.subject', 'Subject', required=True),
-        'class_id': fields.many2one('school.class', 'Class', required=True),
         'weight': fields.integer('Weight', help="Define weight to calculate average"),
-
+        'semester': fields.selection([
+            ('first', 'First Semester'),
+            ('second', 'Second Semester'),
+        ], 'Semester', readonly=True, copy=False, select=True),
     }
