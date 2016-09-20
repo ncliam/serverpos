@@ -146,20 +146,70 @@ class school_exam_move(osv.osv):
     _name = 'school.exam.move'
 
     _columns = {
+        'name': fields.char('Name'),
         'class_id': fields.many2one('school.class', 'Class', required=True),
         'user_id': fields.many2one('res.users', 'Teacher', required=True),
-        'name': fields.char('Name', required=True),
-        'student_id': fields.many2one('hr.employee', 'Student', domain=[('student', '=', True)],
-                                      change_default=True, readonly=True, states={'draft': [('readonly', False)]},
-                                      ondelete='restrict'),
-        'mark': fields.float('Mark', readonly=True, states={'draft': [('readonly', False)]}),
-
-        'date_exam': fields.datetime('Date', required=True, readonly=True, select=True,
-                                      states={'draft': [('readonly', False)]}, copy=False),
+        'student_id': fields.many2one('hr.employee', 'Student',
+                        domain=[('student', '=', True)], required=True, ondelete='restrict'),
+        'mark': fields.float('Mark'),
+        'date_exam': fields.datetime('Date', required=True),
         'subject_id': fields.many2one('school.subject', 'Subject', required=True),
         'weight': fields.integer('Weight', help="Define weight to calculate average"),
+        'type': fields.selection([
+            ('w1', 'Weight 1'),
+            ('w2', 'Weight 2'),
+            ('final', 'Final Exam'),
+        ], 'Type', required=True, select=True),
+
         'semester': fields.selection([
             ('first', 'First Semester'),
             ('second', 'Second Semester'),
-        ], 'Semester', readonly=True, copy=False, select=True),
+        ], 'Semester', required=True, select=True),
+        'sequence': fields.integer('Sequence', help="Sort by order"),
+    }
+
+class school_schedule(osv.osv):
+    _name = 'school.schedule'
+
+    _columns = {
+        'name': fields.char('Name'),
+        'class_id': fields.many2one('school.class', 'Class', required=True),
+        'semester': fields.selection([
+            ('first', 'First Semester'),
+            ('second', 'Second Semester'),
+        ], 'Semester', required=True, select=True),
+        'lines': fields.one2many('school.schedule.line', 'schedule_id', 'Schedulle Lines'),
+    }
+
+    _defaults = {
+        'name': '/',
+    }
+
+
+class school_schedule_line(osv.osv):
+    _name = 'school.schedule.line'
+
+    _columns = {
+        'name': fields.char('Name'),
+        'schedule_id': fields.many2one('school.schedule', 'Schedule Ref', required=True, ondelete='cascade', select=True),
+        'week_day': fields.selection([
+            ('mon', 'Monday'),
+            ('tue', 'Tuesday'),
+            ('wed', 'Wednesday'),
+            ('thu', 'Thursday'),
+            ('fri', 'Friday'),
+            ('sat', 'Saturday'),
+            ('sun', 'Sunday'),
+        ], 'Week Day', required=True, select=True),
+        'class_id': fields.related('schedule_id', 'class_id', type='many2one', relation='school.class', store=True,
+                                      string='Class'),
+        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
+        'user_id': fields.many2one('res.users', 'Teacher', required=True),
+        'begin': fields.datetime('Begin', required=True),
+        'end': fields.datetime('End', required=True),
+
+    }
+
+    _defaults = {
+        'name': '/',
     }

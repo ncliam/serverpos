@@ -417,6 +417,164 @@
         </record>
 
         <menuitem action="action_school_parents" id="menu_school_parent" sequence="1" parent="menu_school_link_admin"/>
-            
+
+
+        <record id="view_school_schedule_tree" model="ir.ui.view">
+            <field name="name">school.schedule</field>
+            <field name="model">school.schedule</field>
+            <field name="arch" type="xml">
+                <tree string="Schedule">
+                    <field name="name"/>
+                    <field name="class_id"/>
+                    <field name="semester"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_school_schedule_form" model="ir.ui.view">
+            <field name="name">school.schedule</field>
+            <field name="model">school.schedule</field>
+            <field name="arch" type="xml">
+                <form string="Schedule">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <group>
+                            <group>
+                                <field name="class_id"/>
+                                <field name="semester"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Lines">
+                                <field name="lines">
+                                    <form string="Schedule Lines">
+                                        <group>
+                                            <field name="week_day"/>
+                                            <field name="user_id"/>
+                                            <field name="subject_id"/>
+                                            <field name="begin"/>
+                                            <field name="end"/>
+                                        </group>
+                                    </form>
+                                    <tree string="Schedule Lines" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="week_day"/>
+                                        <field name="user_id"/>
+                                        <field name="subject_id"/>
+                                        <field name="begin"/>
+                                        <field name="end"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
+        <record id="action_school_schedule" model="ir.actions.act_window">
+            <field name="name">Schedule</field>
+            <field name="res_model">school.schedule</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new schedule.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="action_school_schedule" id="menu_school_schedule" sequence="1" parent="menu_school_link_admin"/>
+
+
+
+        <record id="view_exam_move_tree" model="ir.ui.view">
+            <field name="name">school.exam.move</field>
+            <field name="model">school.exam.move</field>
+            <field name="arch" type="xml">
+                <tree string="Exam Moves">
+                    <field name="name"/>
+                    <field name="class_id"/>
+                    <field name="user_id"/>
+                    <field name="student_id"/>
+                    <field name="subject_id"/>
+                    <field name="date_exam"/>
+                    <field name="type"/>
+                    <field name="semester"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_exam_move_form" model="ir.ui.view">
+            <field name="name">school.exam.move</field>
+            <field name="model">school.exam.move</field>
+            <field name="arch" type="xml">
+                <form string="Exam Move">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <div class="oe_right oe_button_box" name="button_box">
+                            <!-- Put here related buttons -->
+                        </div>
+                        <notebook>
+                            <page string="Information">
+                                <group>
+                                    <group>
+                                        <field name="class_id" />
+                                        <field name="student_id"/>
+                                        <field name="subject_id"/>
+                                        <field name="date_exam"/>
+                                    </group>
+                                    <group string="Marks">
+                                        <field name="user_id"/>
+                                        <field name="type"/>
+                                        <field name="semester"/>
+                                        <field name="sequence"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
+        <record id="action_school_exam_move" model="ir.actions.act_window">
+            <field name="name">Exam Move</field>
+            <field name="res_model">school.exam.move</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new exam move.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="action_school_exam_move" id="menu_school_exam_move" sequence="1" parent="menu_school_link_teacher"/>
+
     </data>
 </openerp>
