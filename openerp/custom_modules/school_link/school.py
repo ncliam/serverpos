@@ -69,11 +69,12 @@ class res_user(osv.osv):
         user_id = self.pool.get('res.users').browse(cr, uid, uid, context=context)
         if user_id.partner_id and user_id.partner_id.mobile:
             mobile = user_id.partner_id.mobile
-            partner_ids = self.pool.get('res_partner').search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)], ('company_id', '=', school), context=context)
+            partner_ids = self.pool.get('res.partner').search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True),('company_id', '=', school)], context=context)
             if (partner_ids):
+                partner_ids = self.pool.get('res.partner').browse(cr, SUPERUSER_ID, partner_ids, context=context)
                 for partner_id in partner_ids:
                     if partner_id.children:
-                        childs.append(partner_id.children)
+                        childs.append([x.id for x in partner_id.children])
 
         return childs
 
