@@ -11,6 +11,7 @@
                     <group>
                         <group string="School Link">
                             <field name="school"/>
+                            <field name="children"/>
                         </group>
                     </group>
                 </xpath>
@@ -575,6 +576,7 @@
                                         <field name="class_id" />
                                         <field name="student_id"/>
                                         <field name="subject_id"/>
+                                        <field name="mark"/>
                                         <field name="date_exam"/>
                                     </group>
                                     <group string="Marks">

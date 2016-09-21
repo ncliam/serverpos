@@ -59,26 +59,6 @@ class res_user(osv.osv):
             raise osv.except_osv(_('error!'), _("Invalid school selected"))
 
 
-    def get_children(self, cr, uid, school=None, context=None):
-        childs = []
-        if school == None:
-            schools = self.get_schools(cr, uid, context=context)
-            if schools and len(school) > 0:
-                school == schools[0]
-
-        user_id = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-        if user_id.partner_id and user_id.partner_id.mobile:
-            mobile = user_id.partner_id.mobile
-            partner_ids = self.pool.get('res.partner').search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True),('company_id', '=', school)], context=context)
-            if (partner_ids):
-                partner_ids = self.pool.get('res.partner').browse(cr, SUPERUSER_ID, partner_ids, context=context)
-                for partner_id in partner_ids:
-                    if partner_id.children:
-                        childs.append([x.id for x in partner_id.children])
-
-        return childs
-
-
     def get_relate_schools(self, cr, uid, ids, name, args, context=None):
         res = {}
         for user_id in self.browse(cr, uid, ids, context=context):
@@ -100,9 +80,33 @@ class res_partner(osv.osv):
 
 class res_company(osv.osv):
     _inherit = 'res.company'
+
+    def get_study_child(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for school_id in self.browse(cr, uid, ids, context=context):
+            res[school_id.id] = self._get_children(cr, uid, school_id.id, context=context)
+        return res
+
+    def _get_children(self, cr, uid, school, context=None):
+        childs = []
+
+        user_id = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+        if user_id.partner_id and user_id.partner_id.mobile:
+            mobile = user_id.partner_id.mobile
+            partner_ids = self.pool.get('res.partner').search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True),('company_id', '=', school)], context=context)
+            if (partner_ids):
+                partner_ids = self.pool.get('res.partner').browse(cr, SUPERUSER_ID, partner_ids, context=context)
+                for partner_id in partner_ids:
+                    if partner_id.children:
+                        for x in partner_id.children:
+                            childs.append(x.id)
+
+        return childs
+
     
     _columns = {
         'school': fields.boolean('School'),
+        'children': fields.function(get_study_child, relation='hr.employee', type='many2many', string='Childs in study', readonly=True),
     }
 
 
