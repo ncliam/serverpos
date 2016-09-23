@@ -154,9 +154,7 @@ class hr_employee(osv.osv):
         'teacher': fields.boolean('Is a Teacher'),
         'student': fields.boolean('Is a Student'),
         'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'partner_id', 'student_id', 'Parents'),
-
-        'class_ids': fields.many2many('school.class', 'school_class_student_rel', 'student_id', 'class_id', 'Classes',
-                                        domain="[('active','=',True)]"),
+        'class_ids': fields.many2many('school.class', 'school_class_student_rel', 'student_id', 'class_id', 'Classes', domain="[('active','=',True)]"),
     }
 
     _defaults = {
@@ -248,6 +246,7 @@ class school_subject(osv.osv):
         'company_id': _get_default_company,
     }
 
+
 class school_class(osv.osv):
     _name = 'school.class'
 
@@ -331,12 +330,30 @@ class school_exam_move(osv.osv):
             ('second', 'Second Semester'),
         ], 'Semester', required=True, select=True),
         'sequence': fields.integer('Sequence', help="Sort by order"),
-        'company_id': fields.related('class_id', 'company_id', type='many2one', string='School'),
+        'company_id': fields.related('class_id', 'company_id', type='many2one', relation='res.company', string='School'),
     }
 
     _defaults = {
+        'name': "/",
         'teacher_id': _get_default_teacher,
     }
+
+    def create_multi(self, cr, uid, moves, context=None):
+        if context is None:
+            context = {}
+        move_ids = []
+        for move in moves:
+            move_id = self.create(cr, uid, move, context=context)
+            move_ids.append(move_id)
+
+        return move_ids
+
+    def write_multi(self, cr, uid, moves, context=None):
+        if context is None:
+            context = {}
+        for move in moves:
+            if move.has_key('id'):
+                self.write(cr, uid, [move['id']], move, context=context)
 
 class school_schedule(osv.osv):
     _name = 'school.schedule'
@@ -349,7 +366,7 @@ class school_schedule(osv.osv):
             ('second', 'Second Semester'),
         ], 'Semester', required=True, select=True),
         'lines': fields.one2many('school.schedule.line', 'schedule_id', 'Schedulle Lines'),
-        'company_id': fields.related('class_id', 'company_id', type='many2one', string='School'),
+        'company_id': fields.related('class_id', 'company_id', relation='res.company', type='many2one', string='School'),
     }
 
     _defaults = {
