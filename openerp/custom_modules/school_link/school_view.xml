@@ -68,6 +68,7 @@
                     <page name='school_link' string="School Link">
                         <group>
                             <field name="school_ids"/>
+                            <field name="children"/>
                         </group>
                     </page>
                 </xpath>

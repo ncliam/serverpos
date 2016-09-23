@@ -46,6 +46,39 @@ class res_user(osv.osv):
 
         return school_ids
 
+
+    def _get_all_children(self, cr, uid, context=None):
+
+        child_ids = []
+        res_user = self.pool.get('res.users')
+        res_partner = self.pool.get('res.partner')
+
+        user_id = res_user.browse(cr, uid, uid, context=context)
+        if user_id.partner_id and user_id.partner_id.mobile:
+            mobile = user_id.partner_id.mobile
+            partner_ids = res_partner.search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)],
+                                             context=context)
+            if (partner_ids):
+                for partner_id in partner_ids:
+                    partner = res_partner.browse(cr, SUPERUSER_ID, partner_id, context=context)
+                    for child_id in partner.children:
+                        child_ids.append(child_id.id)
+
+        return child_ids
+
+
+    def get_relate_schools(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for user_id in self.browse(cr, uid, ids, context=context):
+            res[user_id.id] = self._get_schools(cr, user_id.id, context=context)
+        return res
+
+    def get_all_children(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for user_id in self.browse(cr, uid, ids, context=context):
+            res[user_id.id] = self._get_all_children(cr, user_id.id, context=context)
+        return res
+
     def select_school(self, cr, uid, school=None, context=None):
         if school:
             company_id = self.pool.get('res.company').browse(cr, SUPERUSER_ID, school, context=context)
@@ -58,16 +91,11 @@ class res_user(osv.osv):
         else:
             raise osv.except_osv(_('error!'), _("Invalid school selected"))
 
-
-    def get_relate_schools(self, cr, uid, ids, name, args, context=None):
-        res = {}
-        for user_id in self.browse(cr, uid, ids, context=context):
-            res[user_id.id] = self._get_schools(cr, user_id.id, context=context)
-        return res
-
     _columns = {
         'school_ids': fields.function(get_relate_schools, relation='res.company', type='many2many',
                                            string='Related Schools', readonly=True),
+        'children': fields.function(get_all_children, relation='hr.employee', type='many2many',
+                                           string='Children', readonly=True),
     }
 
 
