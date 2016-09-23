@@ -36,6 +36,9 @@
                             <field name="student"/>
                             <field name="parent_ids" attrs="{'invisible':[('student','=',False)]}" />
                         </group>
+                        <group>
+                            <field name="class_ids" attrs="{'invisible':[('student','=',False)]}" />
+                        </group>
                     </page>
                 </xpath>
             </field>
@@ -365,6 +368,15 @@
 
                                 </group>
                             </page>
+                            <page string="Teachers and Parents">
+                                <group>
+                                    <group>
+                                        <field name="teacher_ids"/>
+                                        <field name="parent_ids"/>
+                                    </group>
+
+                                </group>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>
@@ -493,7 +505,7 @@
                                     <form string="Schedule Lines">
                                         <group>
                                             <field name="week_day"/>
-                                            <field name="user_id"/>
+                                            <field name="teacher_id"/>
                                             <field name="subject_id"/>
                                             <field name="begin"/>
                                             <field name="end"/>
@@ -502,7 +514,7 @@
                                     <tree string="Schedule Lines" editable="bottom">
                                         <field name="name"/>
                                         <field name="week_day"/>
-                                        <field name="user_id"/>
+                                        <field name="teacher_id"/>
                                         <field name="subject_id"/>
                                         <field name="begin"/>
                                         <field name="end"/>

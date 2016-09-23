@@ -1,42 +1,56 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
+access_res_partner_school_super_admin,res.partner school_admin,base.model_res_partner,school_link.group_school_super_admin,1,1,1,1
 access_res_partner_school_admin,res.partner school_admin,base.model_res_partner,school_link.group_school_admin,1,1,1,1
 access_res_partner_school_teacher,res.partner school_teacher,base.model_res_partner,school_link.group_school_teacher,1,0,0,0
 access_res_partner_school_parent,res.partner school_parent,base.model_res_partner,school_link.group_school_parent,1,0,0,0
 
+access_res_user_school_super_admin,res_user school_admin,base.model_res_users,school_link.group_school_super_admin,1,1,1,1
 access_res_user_school_admin,res_user school_admin,base.model_res_users,school_link.group_school_admin,1,1,1,1
 access_res_user_school_teacher,res_user school_teacher,base.model_res_users,school_link.group_school_teacher,1,0,0,0
 access_res_user_school_parent,res_user school_parent,base.model_res_users,school_link.group_school_parent,1,0,0,0
 
+access_hr_emp_school_super_admin,hr.employee school_admin,hr.model_hr_employee,school_link.group_school_super_admin,1,1,1,1
 access_hr_emp_school_admin,hr.employee school_admin,hr.model_hr_employee,school_link.group_school_admin,1,1,1,1
 access_hr_emp_school_teacher,hr.employee school_teacher,hr.model_hr_employee,school_link.group_school_teacher,1,1,1,0
 access_hr_emp_school_parent,hr.employee school_parent,hr.model_hr_employee,school_link.group_school_parent,1,0,0,0
 
+access_school_scholarity_super_admin,school.scholarity school_admin,model_school_scholarity,school_link.group_school_super_admin,1,1,1,1
 access_school_scholarity_admin,school.scholarity school_admin,model_school_scholarity,school_link.group_school_admin,1,1,1,1
 access_school_scholarity_teacher,school.scholarity school_teacher,model_school_scholarity,school_link.group_school_teacher,1,0,0,0
 access_school_scholarity_parent,school.scholarity school_parent,model_school_scholarity,school_link.group_school_parent,1,0,0,0
 
+access_school_subject_super_admin,school.subject school_admin,model_school_subject,school_link.group_school_super_admin,1,1,1,1
 access_school_subject_admin,school.subject school_admin,model_school_subject,school_link.group_school_admin,1,1,1,1
 access_school_scholarity_teacher,school.subject school_teacher,model_school_subject,school_link.group_school_teacher,1,0,0,0
 access_school_scholarity_parent,school.subject school_parent,model_school_subject,school_link.group_school_parent,1,0,0,0
 
+access_school_class_group_super_admin,school.class.group school_admin,model_school_class_group,school_link.group_school_super_admin,1,1,1,1
 access_school_class_group_admin,school.class.group school_admin,model_school_class_group,school_link.group_school_admin,1,1,1,1
 access_school_class_group_teacher,school.class.group school_teacher,model_school_class_group,school_link.group_school_teacher,1,0,0,0
 access_school_class_group_parent,school.class.group school_parent,model_school_class_group,school_link.group_school_parent,1,0,0,0
 
+access_school_class_super_admin,school.class school_admin,model_school_class,school_link.group_school_super_admin,1,1,1,1
 access_school_class_admin,school.class school_admin,model_school_class,school_link.group_school_admin,1,1,1,1
 access_school_class_teacher,school.class school_teacher,model_school_class,school_link.group_school_teacher,1,0,0,0
 access_school_class_parent,school.class school_parent,model_school_class,school_link.group_school_parent,1,0,0,0
 
+access_school_exam_move_super_admin,school.exam.move school_admin,model_school_exam_move,school_link.group_school_super_admin,1,0,0,0
 access_school_exam_move_admin,school.exam.move school_admin,model_school_exam_move,school_link.group_school_admin,1,0,0,0
 access_school_exam_move_teacher,school.exam.move school_teacher,model_school_exam_move,school_link.group_school_teacher,1,1,1,1
 access_school_exam_move_parent,school.exam.move school_parent,model_school_exam_move,school_link.group_school_parent,1,0,0,0
 
+access_school_schedule_super_admin,school.schedule school_admin,model_school_schedule,school_link.group_school_super_admin,1,1,1,1
 access_school_schedule_admin,school.schedule school_admin,model_school_schedule,school_link.group_school_admin,1,1,1,1
 access_school_schedule_teacher,school.schedule school_teacher,model_school_schedule,school_link.group_school_teacher,1,1,1,1
 access_school_schedule_parent,school.schedule school_parent,model_school_schedule,school_link.group_school_parent,1,0,0,0
 
+access_school_schedule_line_super_admin,school.schedule.line school_admin,model_school_schedule_line,school_link.group_school_super_admin,1,1,1,1
 access_school_schedule_line_admin,school.schedule.line school_admin,model_school_schedule_line,school_link.group_school_admin,1,1,1,1
 access_school_schedule_line_teacher,school.schedule.line school_teacher,model_school_schedule_line,school_link.group_school_teacher,1,1,1,1
 access_school_schedule_line_parent,school.schedule.line school_parent,model_school_schedule_line,school_link.group_school_parent,1,0,0,0
 
+access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_super_admin,1,1,1,1
+access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_admin,1,1,1,1
+access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_teacher,1,0,0,0
+access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_teacher,1,0,0,0

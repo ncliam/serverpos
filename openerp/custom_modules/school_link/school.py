@@ -126,6 +126,9 @@ class hr_employee(osv.osv):
         'teacher': fields.boolean('Is a Teacher'),
         'student': fields.boolean('Is a Student'),
         'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'partner_id', 'student_id', 'Parents'),
+
+        'class_ids': fields.many2many('school.class', 'school_class_student_rel', 'student_id', 'class_id', 'Classes',
+                                        domain="[('active','=',True)]"),
     }
 
     _defaults = {
@@ -225,6 +228,36 @@ class school_class(osv.osv):
         if not company_id:
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
+
+    def _get_all_teachers(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for class_id in self.browse(cr, uid, ids, context=context):
+            teacher_ids = []
+            teacher_ids.append(class_id.teacher_id.id) # add primary teacher
+
+            schedule_line_ids = self.pool.get('school.schedule.line').search(cr, uid,[('schedule_id.class_id', '=', class_id.id)], context=context)
+            schedule_lines = self.pool.get('school.schedule.line').browse(cr, uid, schedule_line_ids, context=context)
+            for schedule_line in schedule_lines:
+                teacher_ids.append(schedule_line.teacher_id.id) # add other teachers
+
+            all_teacher_ids = self.pool.get('hr.employee').search(cr, uid, [('id', 'in', teacher_ids)], context=context)
+            res[class_id.id] = all_teacher_ids
+
+        return res
+
+    def _get_all_parents(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for class_id in self.browse(cr, uid, ids, context=context):
+            parent_ids = []
+            for student in class_id.student_ids:
+                student_parent_ids = student.parent_ids
+                for parent_id in student_parent_ids:
+                    parent_ids.append(parent_id.id)
+
+            all_parent_ids = self.pool.get('res.partner').search(cr, uid, [('id', 'in', parent_ids)], context=context)
+            res[class_id.id] = all_parent_ids
+
+        return res
     
     _columns = {
         'name': fields.char('Name', required=True),
@@ -234,6 +267,8 @@ class school_class(osv.osv):
         'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]"),
         'student_ids':fields.many2many('hr.employee', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
         'active': fields.related('year_id', 'active', type='boolean', string='Active'),
+        'teacher_ids': fields.function(_get_all_teachers, relation='hr.employee', type='many2many', string='Teachers',readonly=True),
+        'parent_ids': fields.function(_get_all_parents, relation='res.partner', type='many2many', string='Parents', readonly=True),
     }
 
     _defaults = {
@@ -265,6 +300,7 @@ class school_exam_move(osv.osv):
             ('second', 'Second Semester'),
         ], 'Semester', required=True, select=True),
         'sequence': fields.integer('Sequence', help="Sort by order"),
+        'company_id': fields.related('class_id', 'company_id', type='many2one', string='School'),
     }
 
 class school_schedule(osv.osv):
@@ -278,6 +314,7 @@ class school_schedule(osv.osv):
             ('second', 'Second Semester'),
         ], 'Semester', required=True, select=True),
         'lines': fields.one2many('school.schedule.line', 'schedule_id', 'Schedulle Lines'),
+        'company_id': fields.related('class_id', 'company_id', type='many2one', string='School'),
     }
 
     _defaults = {
@@ -300,13 +337,11 @@ class school_schedule_line(osv.osv):
             ('sat', 'Saturday'),
             ('sun', 'Sunday'),
         ], 'Week Day', required=True, select=True),
-        'class_id': fields.related('schedule_id', 'class_id', type='many2one', relation='school.class', store=True,
-                                      string='Class'),
+        'class_id': fields.related('schedule_id', 'class_id', type='many2one', relation='school.class', store=True, string='Class'),
         'subject_id': fields.many2one('school.subject', 'Subject', required=True),
-        'user_id': fields.many2one('res.users', 'Teacher', required=True),
+        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain="[('teacher','=',True)]"),
         'begin': fields.datetime('Begin', required=True),
         'end': fields.datetime('End', required=True),
-
     }
 
     _defaults = {

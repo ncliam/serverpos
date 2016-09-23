@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-    	
+    	<!-- SECURITY GROUP -->
     	<record model="ir.module.category" id="module_category_school">
             <field name="name">School Link Role</field>
             <field name="description"></field>
@@ -27,6 +27,75 @@
 	        <field name="name">School Parent</field>
 	        <field name="category_id" ref="module_category_school"/>
 	    </record>
+
+
+		<!-- SECURITY DATA RULE -->
+
+		<record id="rule_school_scholarity_multi_company" model="ir.rule">
+			<field name="name">Scholarity MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_scholarity" />
+			<field name="global" eval="True" />
+			<field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_class_group_multi_company" model="ir.rule">
+			<field name="name">Class Group MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_class_group" />
+			<field name="global" eval="True" />
+			<field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_subject_multi_company" model="ir.rule">
+			<field name="name">School Subject MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_subject" />
+			<field name="global" eval="True" />
+			<field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_subject_no_company" model="ir.rule">
+			<field name="name">School Subject No Company</field>
+			<field name="model_id" ref="school_link.model_school_subject" />
+			<field name="groups" eval="[(4, ref('school_link.group_school_admin'))]"/>
+			<field name="domain_force">[('company_id','=',False)]</field>
+			<field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="perm_write" eval="False"/>
+		</record>
+
+		<record id="rule_school_subject_with_company" model="ir.rule">
+			<field name="name">School Subject with Company</field>
+			<field name="model_id" ref="school_link.model_school_subject" />
+			<field name="groups" eval="[(4, ref('school_link.group_school_admin'))]"/>
+			<field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_class_multi_company" model="ir.rule">
+			<field name="name">School Class MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_class" />
+			<field name="global" eval="True" />
+			<field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_exam_move_multi_company" model="ir.rule">
+			<field name="name">School Exam Move MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_exam_move" />
+			<field name="global" eval="True" />
+			<field name="domain_force">[('class_id.company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_school_schedule_multi_company" model="ir.rule">
+			<field name="name">School Schedule MultiCompany</field>
+			<field name="model_id" ref="school_link.model_school_schedule" />
+			<field name="global" eval="True" />
+			<field name="domain_force">[('class_id.company_id','child_of',[user.company_id.id])]</field>
+		</record>
+
+		<record id="rule_hr_employee_multi_company" model="ir.rule">
+			<field name="name">HR Employee MultiCompany</field>
+			<field name="model_id" ref="hr.model_hr_employee" />
+			<field name="global" eval="True" />
+			<field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+		</record>
     
     </data>
 </openerp>
