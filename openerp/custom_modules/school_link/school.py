@@ -279,12 +279,15 @@ class school_class(osv.osv):
 class school_exam_move(osv.osv):
     _name = 'school.exam.move'
 
+    def _get_default_teacher(self, cr, uid, context=None):
+        teacher_ids = self.pool.get('hr.employee').search(cr, uid, [('teacher', '=', True), ('user_id', "=", uid)],context=context)
+        return teacher_ids and teacher_ids[0]
+
     _columns = {
         'name': fields.char('Name'),
         'class_id': fields.many2one('school.class', 'Class', required=True),
-        'user_id': fields.many2one('res.users', 'Teacher', required=True),
-        'student_id': fields.many2one('hr.employee', 'Student',
-                        domain=[('student', '=', True)], required=True, ondelete='restrict'),
+        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain=[('teacher', '=', True)]),
+        'student_id': fields.many2one('hr.employee', 'Student', required=True, domain=[('student', '=', True)]),
         'mark': fields.float('Mark'),
         'date_exam': fields.datetime('Date', required=True),
         'subject_id': fields.many2one('school.subject', 'Subject', required=True),
@@ -301,6 +304,10 @@ class school_exam_move(osv.osv):
         ], 'Semester', required=True, select=True),
         'sequence': fields.integer('Sequence', help="Sort by order"),
         'company_id': fields.related('class_id', 'company_id', type='many2one', string='School'),
+    }
+
+    _defaults = {
+        'teacher_id': _get_default_teacher,
     }
 
 class school_schedule(osv.osv):

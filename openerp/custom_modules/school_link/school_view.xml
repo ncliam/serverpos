@@ -556,7 +556,7 @@
                 <tree string="Exam Moves">
                     <field name="name"/>
                     <field name="class_id"/>
-                    <field name="user_id"/>
+                    <field name="teacher_id"/>
                     <field name="student_id"/>
                     <field name="subject_id"/>
                     <field name="date_exam"/>
@@ -592,7 +592,7 @@
                                         <field name="date_exam"/>
                                     </group>
                                     <group string="Marks">
-                                        <field name="user_id"/>
+                                        <field name="teacher_id"/>
                                         <field name="type"/>
                                         <field name="semester"/>
                                         <field name="sequence"/>
