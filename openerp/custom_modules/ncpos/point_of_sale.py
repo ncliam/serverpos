@@ -204,6 +204,8 @@ class pos_order_line(osv.osv):
         'uos': fields.many2one('product.uom', 'Product UoS', state={'draft': [('readonly', False)]}, readonly=True),        
         'uos_qty': fields.float('Quantity (UOS)', digits_compute=dp.get_precision('Product UoS')),
         'uos_price_unit': fields.float(string='Unit Price (UOS)', digits_compute=dp.get_precision('Product Price')),
+        'lot_serial': fields.char('Lot Ref'),
+        'lot_id': fields.many2one('stock.production.lot', 'Lot'),
     }
 
     
@@ -226,6 +228,15 @@ class pos_order_line(osv.osv):
 
         if not values.has_key("name") or values['name'] == None:
             values['name'] = "/"
+
+        if values.has_key("lot_serial") and values['lot_serial'] != None:
+            lot_str = values['lot_serial']
+            lot_id = self.pool.get("stock.production.lot").search(cr, uid,
+                                            ['|',('name',"=",lot_str),('ref',"=",lot_str)]
+                                        , context=context, limit=1)
+            if lot_id and lot_id[0]:
+                lot_id = lot_id[0]
+                values['lot_id'] = lot_id
 
         return super(pos_order_line, self).create(cr, uid, values, context=context)
 

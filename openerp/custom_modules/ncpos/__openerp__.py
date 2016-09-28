@@ -39,7 +39,7 @@ Main Features
     """,
     'author': 'ncliam',
     'depends': ['point_of_sale','base_import','account', 'product_expiry',
-                    'purchase', 'sale', 'auth_signup','product_barcode_generator'],
+                    'purchase', 'sale', 'auth_signup','product_barcode_generator','pricelist_uom'],
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',
