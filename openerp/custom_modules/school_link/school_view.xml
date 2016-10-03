@@ -52,6 +52,7 @@
                 <xpath expr="//page[@string='Contacts']" position="after">
                     <page name='school_link' string="School Link">
                         <group>
+                            <field name="parent_user_id"/>
                             <field name="children"/>
                         </group>
                     </page>

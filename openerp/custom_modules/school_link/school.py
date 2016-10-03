@@ -23,6 +23,22 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import SUPERUSER_ID
 import datetime
+from ast import literal_eval
+
+class email_template(osv.osv):
+    _inherit = "email.template"
+
+    def _get_default_gateway(self, cr, uid, context=None):
+        gateway_id = self.pool.get('sms.smsclient').search(cr, uid, [], context=context, limit=1)
+        if not gateway_id:
+            raise osv.except_osv(_('Error!'), _('There is no default gateway for the current user!'))
+        return gateway_id[0]
+
+    _defaults = {
+        'sms_template': True,
+        'gateway_id': _get_default_gateway,
+    }
+
 
 class res_user(osv.osv):
     _inherit = 'res.users'
@@ -33,7 +49,7 @@ class res_user(osv.osv):
         res_user = self.pool.get('res.users')
         res_partner = self.pool.get('res.partner')
 
-        user_id = res_user.browse(cr, uid, uid, context=context)
+        user_id = res_user.browse(cr, SUPERUSER_ID, uid, context=context)
         if user_id.partner_id and user_id.partner_id.mobile:
             mobile = user_id.partner_id.mobile
             partner_ids = res_partner.search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)],
@@ -53,7 +69,7 @@ class res_user(osv.osv):
         res_user = self.pool.get('res.users')
         res_partner = self.pool.get('res.partner')
 
-        user_id = res_user.browse(cr, uid, uid, context=context)
+        user_id = res_user.browse(cr, SUPERUSER_ID, uid, context=context)
         if user_id.partner_id and user_id.partner_id.mobile:
             mobile = user_id.partner_id.mobile
             partner_ids = res_partner.search(cr, SUPERUSER_ID, [('mobile', '=', mobile), ('customer', '=', True)],
@@ -69,13 +85,13 @@ class res_user(osv.osv):
 
     def get_relate_schools(self, cr, uid, ids, name, args, context=None):
         res = {}
-        for user_id in self.browse(cr, uid, ids, context=context):
+        for user_id in self.browse(cr, SUPERUSER_ID, ids, context=context):
             res[user_id.id] = self._get_schools(cr, user_id.id, context=context)
         return res
 
     def get_all_children(self, cr, uid, ids, name, args, context=None):
         res = {}
-        for user_id in self.browse(cr, uid, ids, context=context):
+        for user_id in self.browse(cr, SUPERUSER_ID, ids, context=context):
             res[user_id.id] = self._get_all_children(cr, user_id.id, context=context)
         return res
 
@@ -98,13 +114,75 @@ class res_user(osv.osv):
                                            string='Children', readonly=True),
     }
 
+    def signup(self, cr, uid, values, token=None, context=None):
+        if context is None:
+            context = {}
+
+        code_obj = self.pool.get('sms.authentication')
+        if context.has_key('verify_phonenumber'):
+            if token:
+                if not values.has_key("written_code"):
+                    raise osv.except_osv(_('error!'), _("No verification code"))
+                written_code =  values['written_code']
+
+                code_ids = code_obj.search(cr, uid, [('id', '=', token)], limit=1)
+                code = code_obj.browse(cr, uid, code_ids[0])
+                if not code or code.state == 'cancel' or datetime.datetime.strptime(code.validity, "%Y-%m-%d %H:%M:%S") <= datetime.datetime.now() :
+                    raise osv.except_osv(_('error!'), _("Invalid verification code (Expired or Cancelled)."))
+
+                if not code_obj.verify_code(written_code):
+                    raise osv.except_osv(_('error!'), _("Wrong verification code"))
+
+                return self._create_parent_user(cr, uid, values, context=context)
+
+            else:
+                verfication_code_data = {
+                    'mobile': values['login'],
+                    'country_id': 243,
+
+                }
+                code_id = code_obj.create(cr, uid, verfication_code_data, context=context)
+                return code_id
+
+        else:
+            return super(res_user, self).signup(cr, uid, values, token=False, context=context)
+
+
+    def _create_parent_user(self, cr, uid, values, context=None):
+        """ create a new user from the template user """
+        ir_config_parameter = self.pool.get('ir.config_parameter')
+        template_user_id = literal_eval(ir_config_parameter.get_param(cr, uid, 'auth_signup.template_user_id', 'False'))
+        assert template_user_id and self.exists(cr, uid, template_user_id, context=context), 'Signup: invalid template user'
+
+        assert values.get('login'), "Signup: no login given for new user"
+        assert values.get('partner_id') or values.get('name'), "Signup: no name or partner given for new user"
+
+        # create a copy of the template user (attached to a specific partner_id if given)
+        values['active'] = True
+        context = dict(context or {}, no_reset_password=True)
+        return self.copy(cr, uid, template_user_id, values, context=context)
+
 
 class res_partner(osv.osv):
     _inherit = 'res.partner'
 
+    def get_parent_user(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for partner_id in self.browse(cr, SUPERUSER_ID, ids, context=context):
+            mobile = partner_id.mobile
+            if mobile:
+                same_mobile_ids = self.search(cr, SUPERUSER_ID, [('mobile','=',mobile)], context=context)
+                related_users = self.pool.get('res.users').search(cr, SUPERUSER_ID, [('partner_id','in', same_mobile_ids)], context=context)
+                res[partner_id.id] = related_users and related_users[0] or None
+            else:
+                res[partner_id.id] = None
+        return res
+
     _columns = {
         'children': fields.many2many('hr.employee', 'parent_student_rel', 'student_id', 'partner_id', 'Childs', readonly=True),
+        'parent_user_id': fields.function(get_parent_user, relation='res.users', type='many2one', string='Related User', readonly=True),
     }
+
 
 class res_company(osv.osv):
     _inherit = 'res.company'

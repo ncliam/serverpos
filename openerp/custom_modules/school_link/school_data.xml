@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- SMS template for OTP verify phone number -->
+        <record id="registration_code_sms" model="email.template">
+            <field name="name">Registration OTP</field>
+            <field name="model_id" ref="website_sms_authentication.model_sms_authentication"/>
+            <field name="mobile_to">${object.mobile|safe}</field>
+            <field name="subject">Registration code</field>
+
+            <field name="body_html">
+                <![CDATA[
+                    <p>Your code is ${object.name}"</p>
+                ]]>
+            </field>
+        </record>
+    </data>
+</openerp>
