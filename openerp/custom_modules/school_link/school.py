@@ -183,6 +183,16 @@ class res_partner(osv.osv):
         'parent_user_id': fields.function(get_parent_user, relation='res.users', type='many2one', string='Related User', readonly=True),
     }
 
+    def create_multi(self, cr, uid, datas, context=None):
+        if context is None:
+            context = {}
+        partner_ids = []
+        for vals in datas:
+            partner_id = self.create(cr, uid, vals, context=context)
+            partner_ids.append(partner_id)
+
+        return partner_ids
+
 
 class res_company(osv.osv):
     _inherit = 'res.company'
@@ -244,6 +254,16 @@ class hr_employee(osv.osv):
             context = {}
         context = dict(context, mail_create_nosubscribe=True)
         return super(hr_employee, self).create(cr, uid, values, context=context)
+
+    def create_multi(self, cr, uid, datas, context=None):
+        if context is None:
+            context = {}
+        emp_ids = []
+        for vals in datas:
+            emp_id = self.create(cr, uid, vals, context=context)
+            emp_ids.append(emp_id)
+
+        return emp_ids
 
 class school_scholarity(osv.osv):
     _name = 'school.scholarity'
