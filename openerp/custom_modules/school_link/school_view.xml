@@ -421,7 +421,7 @@
         <record id="action_school_students" model="ir.actions.act_window">
             <field name="name">Students</field>
             <field name="res_model">hr.employee</field>
-            <field name="view_type">tree</field>
+            <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('student','=',True)]</field>
             <field name="context">{'search_default_student': 1,'default_student': 1}</field>
@@ -436,7 +436,7 @@
         <record id="action_school_teachers" model="ir.actions.act_window">
             <field name="name">Teachers</field>
             <field name="res_model">hr.employee</field>
-            <field name="view_type">tree</field>
+            <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('teacher','=',True)]</field>
             <field name="context">{'search_default_teacher': 1,'default_teacher': 1}</field>

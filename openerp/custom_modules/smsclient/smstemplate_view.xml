@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- ************************************************************** -->
+        <!-- ** SMS Template ****************************************** -->
+        <!-- ************************************************************** -->
+        <record model="ir.ui.view" id="email_template_form">
+            <field name="name">email.template.form</field>
+            <field name="model">email.template</field>
+            <field name="inherit_id" ref="email_template.email_template_form"/>
+            <field name="arch" type="xml">
+            	<field name="email_to" position="after">
+            		<field name="mobile_to"/>
+				</field>
+				<field name="lang" position="before">
+					<field name="sms_template"/>
+					<field name="gateway_id"/>
+				</field>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_sms_template_tree_all">
+            <field name="name">SMS Templates</field>
+            <field name="res_model">email.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="domain">[('sms_template', '=', True)]</field>
+            <field name="context">{'default_sms_template': '1'}]</field>
+            <field name="view_id" ref="email_template.email_template_tree"/>
+            <field name="search_view_id" ref="email_template.view_email_template_search"/>
+        </record>
+
+        <menuitem id="menu_sms_templates"
+            parent="menu_smsclient_administration_server"
+            action="action_sms_template_tree_all"
+            sequence="15"/>
+
+    </data>
+</openerp>
