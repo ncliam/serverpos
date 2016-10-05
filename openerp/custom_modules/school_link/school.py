@@ -107,6 +107,30 @@ class res_user(osv.osv):
         else:
             raise osv.except_osv(_('error!'), _("Invalid school selected"))
 
+
+    def get_chat_name(self, cr, uid, user_ids, context=None):
+        result = {}
+        for user_id in user_ids:
+            employee_ids = self.pool.get('hr.employee').search(cr, uid, [("user_id",'=', user_id)], context=context)
+            employee_id = employee_ids and employee_ids[0] or None
+            name = ''
+            if not employee_id:
+                user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, user_id, context=context)
+                mobile = user.partner_id.mobile
+
+                parent_ids = self.pool.get('res.partner').search(cr, uid, [("mobile", '=', mobile),('customer','=', True)], context=context)
+                parent_id = parent_ids and parent_ids[0] or None
+                if parent_id:
+                    parent = self.pool.get('res.partner').browse(cr, uid, parent_id, context=context)
+                    name = parent.name
+            else:
+                employee = self.pool.get('hr.employee').browse(cr, uid, employee_id, context=context)
+                name = employee.name
+
+            result[user_id] = name
+
+        return result
+
     _columns = {
         'school_ids': fields.function(get_relate_schools, relation='res.company', type='many2many',
                                            string='Related Schools', readonly=True),
