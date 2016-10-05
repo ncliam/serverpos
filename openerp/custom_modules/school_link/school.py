@@ -111,18 +111,20 @@ class res_user(osv.osv):
     def get_chat_name(self, cr, uid, user_ids, context=None):
         result = {}
         for user_id in user_ids:
+            user = self.browse(cr, SUPERUSER_ID, user_id, context=context)
+            name = user.name
+
             employee_ids = self.pool.get('hr.employee').search(cr, uid, [("user_id",'=', user_id)], context=context)
             employee_id = employee_ids and employee_ids[0] or None
-            name = ''
-            if not employee_id:
-                user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, user_id, context=context)
-                mobile = user.partner_id.mobile
 
-                parent_ids = self.pool.get('res.partner').search(cr, uid, [("mobile", '=', mobile),('customer','=', True)], context=context)
-                parent_id = parent_ids and parent_ids[0] or None
-                if parent_id:
-                    parent = self.pool.get('res.partner').browse(cr, uid, parent_id, context=context)
-                    name = parent.name
+            if not employee_id:
+                mobile = user.partner_id.mobile
+                if mobile:
+                    parent_ids = self.pool.get('res.partner').search(cr, uid, [("mobile", '=', mobile),('customer','=', True)], context=context)
+                    parent_id = parent_ids and parent_ids[0] or None
+                    if parent_id:
+                        parent = self.pool.get('res.partner').browse(cr, uid, parent_id, context=context)
+                        name = parent.name
             else:
                 employee = self.pool.get('hr.employee').browse(cr, uid, employee_id, context=context)
                 name = employee.name
