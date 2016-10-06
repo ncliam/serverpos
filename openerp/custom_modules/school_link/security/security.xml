@@ -87,7 +87,7 @@
 			<field name="name">School Exam Move Teacher Own</field>
 			<field name="model_id" ref="school_link.model_school_exam_move" />
 			<field name="groups" eval="[(4, ref('school_link.group_school_teacher'))]"/>
-			<field name="domain_force">[('teacher_id.user_id','=',user.id])]</field>
+			<field name="domain_force">[('teacher_id.user_id','=',user.id)]</field>
 		</record>
 
 		<record id="rule_school_schedule_multi_company" model="ir.rule">
