@@ -98,57 +98,55 @@ class pos_order(osv.osv):
             result = super(pos_order, self).create_picking(cr, uid, ids, context=context)
         except Exception as e:
 
-            if context.has_key('create_from_mobility'):
+            partner_obj = self.pool.get('res.partner')
+            move_obj = self.pool.get('stock.move')
 
-                partner_obj = self.pool.get('res.partner')
-                move_obj = self.pool.get('stock.move')
+            for order in self.browse(cr, uid, ids, context=context):
+                if order.state == "done":
+                    continue
 
-                for order in self.browse(cr, uid, ids, context=context):
-                    if order.state == "done":
-                        continue
+                processed_ids = []
+                picking = order.picking_id
+                if picking:
+                    if not picking.pack_operation_ids:
+                        picking.do_prepare_partial()
 
-                    processed_ids = []
-                    picking = order.picking_id
-                    if picking:
-                        if not picking.pack_operation_ids:
-                            picking.do_prepare_partial()
+                    for order_line in order.lines:
+                        picking_type = order.picking_type_id
+                        location_id = order.location_id.id
+                        if order.partner_id:
+                            destination_id = order.partner_id.property_stock_customer.id
+                        elif picking_type:
+                            if not picking_type.default_location_dest_id:
+                                raise osv.except_osv(_('Error!'), _(
+                                    'Missing source or destination location for picking type %s. Please configure those fields and try again.' % (
+                                    picking_type.name,)))
+                            destination_id = picking_type.default_location_dest_id.id
+                        else:
+                            destination_id = \
+                            partner_obj.default_get(cr, uid, ['property_stock_customer'], context=context)[
+                                'property_stock_customer']
 
-                        for order_line in order.lines:
-                            picking_type = order.picking_type_id
-                            location_id = order.location_id.id
-                            if order.partner_id:
-                                destination_id = order.partner_id.property_stock_customer.id
-                            elif picking_type:
-                                if not picking_type.default_location_dest_id:
-                                    raise osv.except_osv(_('Error!'), _(
-                                        'Missing source or destination location for picking type %s. Please configure those fields and try again.' % (
-                                        picking_type.name,)))
-                                destination_id = picking_type.default_location_dest_id.id
-                            else:
-                                destination_id = \
-                                partner_obj.default_get(cr, uid, ['property_stock_customer'], context=context)[
-                                    'property_stock_customer']
+                        pack_datas = {
+                            'product_id': order_line.product_id.id,
+                            'product_uom_id': order_line.product_id.uom_id.id,
+                            'product_qty': order_line.qty,
+                            'lot_id': order_line.lot_id and order_line.lot_id.id or None,
+                            'location_id': location_id if order_line.qty >= 0 else destination_id,
+                            'location_dest_id': destination_id if order_line.qty >= 0 else location_id,
+                            'date': order.date_order,
+                        }
 
-                            pack_datas = {
-                                'product_id': order_line.product_id.id,
-                                'product_uom_id': order_line.product_id.uom_id.id,
-                                'product_qty': order_line.qty,
-                                'lot_id': order_line.lot_id and order_line.lot_id.id or None,
-                                'location_id': location_id if order_line.qty >= 0 else destination_id,
-                                'location_dest_id': destination_id if order_line.qty >= 0 else location_id,
-                                'date': order.date_order,
-                            }
+                        pack_datas['picking_id'] = order.picking_id.id
+                        packop_id = self.pool.get('stock.pack.operation').create(cr, uid, pack_datas, context=context)
+                        processed_ids.append(packop_id)
 
-                            pack_datas['picking_id'] = order.picking_id.id
-                            packop_id = self.pool.get('stock.pack.operation').create(cr, uid, pack_datas, context=context)
-                            processed_ids.append(packop_id)
+                        # Delete the others
+                        packops = self.pool.get('stock.pack.operation').search(cr, uid,['&', ('picking_id', '=', order.picking_id.id), '!', ('id', 'in', processed_ids)], context=context)
+                        self.pool.get('stock.pack.operation').unlink(cr, uid, packops, context=context)
 
-                            # Delete the others
-                            packops = self.pool.get('stock.pack.operation').search(cr, uid,['&', ('picking_id', '=', order.picking_id.id), '!', ('id', 'in', processed_ids)], context=context)
-                            self.pool.get('stock.pack.operation').unlink(cr, uid, packops, context=context)
-
-                            # Execute the transfer of the picking
-                            order.picking_id.do_transfer()
+                        # Execute the transfer of the picking
+                        order.picking_id.do_transfer()
 
 
             return result
