@@ -280,9 +280,22 @@ class hr_employee(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+    def _name_search(self, cr, uid, obj, name, domain, context):
+        res = []
+        for field, operator, value in domain:
+            ids = []
+            vals = value.split()
+            for val in vals:
+                emp_ids = self.search(cr, uid, ['|',('name',operator,val),('last_name', operator, val)], context=context)
+                if emp_ids:
+                    ids.extend(emp_ids)
+
+        res.append(('id', 'in', ids))
+        return res
+
     _columns = {
         'last_name': fields.char('Last Name'),
-        'display_name': fields.function(_name_get_fnc, type="char", string='Display Name'),
+        'display_name': fields.function(_name_get_fnc, type="char", string='Display Name', fnct_search=_name_search),
         'home_town': fields.char('Home town'),
         'home_address': fields.char('Home Address'),
         'teacher': fields.boolean('Is a Teacher'),
