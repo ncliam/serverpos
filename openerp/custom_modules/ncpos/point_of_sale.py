@@ -258,6 +258,7 @@ class pos_order(osv.osv):
 
 class pos_order_line(osv.osv):
     _inherit = "pos.order.line"
+
     
     _columns = {
         'name': fields.char('Line No', required=False, copy=False),
@@ -300,6 +301,7 @@ class pos_order_line(osv.osv):
                 values['lot_id'] = lot_id
 
         return super(pos_order_line, self).create(cr, uid, values, context=context)
+
 
 class stock_production_lot(osv.osv):
     _inherit = 'stock.production.lot'
