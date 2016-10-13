@@ -19,10 +19,14 @@
 #
 #################################################################################
 
+import openerp
+from openerp import SUPERUSER_ID
+from openerp.http import request
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
-from openerp import SUPERUSER_ID
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 import datetime
+
 from ast import literal_eval
 
 class email_template(osv.osv):
@@ -370,6 +374,21 @@ class school_subject(osv.osv):
         'company_id': _get_default_company,
     }
 
+    def _check_duplicate(self, cr, uid, ids, context=None):
+        for subject in self.browse(cr, uid, ids, context=None):
+            domain = [
+                ('name', '=', subject.name),
+                ('company_id','=', subject.company_id.id)
+            ]
+            count = self.search_count(cr, uid, domain, context=context)
+            if count>1:
+                return False
+        return True
+
+    _constraints = [
+        (_check_duplicate, 'Duplicate subject name',['name']),
+    ]
+
 
 class school_class(osv.osv):
     _name = 'school.class'
@@ -414,8 +433,8 @@ class school_class(osv.osv):
         'name': fields.char('Name', required=True),
         'year_id':fields.many2one('school.scholarity', 'Year', required=True),
         'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
-        'group_id':fields.many2one('school.class.group', 'Group', required=True),
-        'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]"),
+        'group_id':fields.many2one('school.class.group', 'Group', required=True, ondelete="cascade"),
+        'teacher_id':fields.many2one('hr.employee', 'Responsible', domain="[('teacher','=',True)]", ondelete="cascade"),
         'student_ids':fields.many2many('hr.employee', 'school_class_student_rel', 'class_id', 'student_id', 'Students', domain="[('student','=',True)]"),
         'active': fields.related('year_id', 'active', type='boolean', string='Active'),
         'teacher_ids': fields.function(_get_all_teachers, relation='hr.employee', type='many2many', string='Teachers',readonly=True),
@@ -441,7 +460,7 @@ class school_exam_move(osv.osv):
         'student_id': fields.many2one('hr.employee', 'Student', required=True, domain=[('student', '=', True)]),
         'mark': fields.float('Mark'),
         'date_exam': fields.datetime('Date', required=True),
-        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
+        'subject_id': fields.many2one('school.subject', 'Subject', ondelete="cascade", required=True),
         'weight': fields.integer('Weight', help="Define weight to calculate average"),
         'type': fields.selection([
             ('w1', 'Weight 1'),
@@ -484,7 +503,7 @@ class school_schedule(osv.osv):
 
     _columns = {
         'name': fields.char('Name'),
-        'class_id': fields.many2one('school.class', 'Class', required=True),
+        'class_id': fields.many2one('school.class', 'Class', required=True, ondelete="cascade"),
         'semester': fields.selection([
             ('first', 'First Semester'),
             ('second', 'Second Semester'),
@@ -496,6 +515,22 @@ class school_schedule(osv.osv):
     _defaults = {
         'name': '/',
     }
+
+    def _check_duplicate(self, cr, uid, ids, context=None):
+        for schedule in self.browse(cr, uid, ids, context=None):
+            domain = [
+                ('class_id', '=', schedule.class_id.id),
+                ('semester', '=', schedule.semester),
+                ('company_id','=', schedule.company_id.id)
+            ]
+            count = self.search_count(cr, uid, domain, context=context)
+            if count>1:
+                return False
+        return True
+
+    _constraints = [
+        (_check_duplicate, 'One schedule allowed only for a semester of class',['class_id','semester','company_id']),
+    ]
 
 
 class school_schedule_line(osv.osv):
@@ -523,3 +558,73 @@ class school_schedule_line(osv.osv):
     _defaults = {
         'name': '/',
     }
+
+
+class im_chat_message(osv.Model):
+
+    _inherit = 'im_chat.message'
+
+    _columns = {
+        'delay_time': fields.datetime('Delay Time'),
+    }
+
+    def get_messages(self, cr, uid, uuid, last_id=False, limit=20, context=None):
+        """ get messages (id desc) from given last_id in the given session """
+        Session = self.pool['im_chat.session']
+        if Session.is_in_session(cr, uid, uuid, uid, context=context):
+            domain = [("to_id.uuid", "=", uuid),("delay_time", '=', None)]
+            if last_id:
+                domain.append(("id", "<", last_id));
+            return self.search_read(cr, uid, domain, ['id', 'create_date','to_id','from_id', 'type', 'message'], limit=limit, context=context)
+        return False
+
+    def post_delay(self, cr, uid, from_uid, uuid, message_type, message_content, delayTime, context=None):
+        """ post and broadcast a message, return the message id """
+        message_id = False
+        Session = self.pool['im_chat.session']
+        session_ids = Session.search(cr, uid, [('uuid','=',uuid)], context=context)
+        notifications = []
+        for session in Session.browse(cr, uid, session_ids, context=context):
+            # build the new message
+            vals = {
+                "from_id": from_uid,
+                "to_id": session.id,
+                "type": message_type,
+                "message": message_content,
+                "delay_time": delayTime,
+            }
+            # save it & broastcast later
+            message_id = self.create(cr, uid, vals, context=context)
+
+        return message_id
+
+    def broadcast_delay(self, cr, uid, context=None):
+        now = datetime.datetime.now().strftime(DATETIME_FORMAT)
+        delay_ids = self.search(cr, SUPERUSER_ID, [('delay_time','<=', now)], context=context)
+        if delay_ids and len(delay_ids) > 0:
+            for message_id in delay_ids:
+                notifications = []
+                # broadcast it to channel (anonymous users) and users_ids
+                data = self.read(cr, SUPERUSER_ID, [message_id], ['from_id', 'to_id', 'create_date', 'type', 'message'],
+                                 context=context)[0]
+                uuid = data['to_id']
+                session = self.pool['im_chat.session'].browse(cr, SUPERUSER_ID, uuid, context=context)
+                notifications.append([uuid, data])
+                for user in session.user_ids:
+                    notifications.append([(cr.dbname, 'im_chat.session', user.id), data])
+                self.pool['bus.bus'].sendmany(cr, uid, notifications)
+
+            # Clear delaytime
+            self.write(cr, SUPERUSER_ID, delay_ids, {'delay_time': None}, context=context)
+
+
+
+class Controller(openerp.addons.im_chat.im_chat.Controller):
+
+    @openerp.http.route('/im_chat/post_delay', type="json", auth="none")
+    def post(self, uuid, message_type, message_content, delayTime):
+        registry, cr, uid, context = request.registry, request.cr, request.session.uid, request.context
+        # execute the post method as SUPERUSER_ID
+        message_id = registry["im_chat.message"].post_delay(cr, openerp.SUPERUSER_ID, uid, uuid, message_type,
+                                                      message_content, delayTime, context=context)
+        return message_id

@@ -53,4 +53,4 @@ access_school_schedule_line_parent,school.schedule.line school_parent,model_scho
 access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_super_admin,1,1,1,1
 access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_admin,1,1,1,1
 access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_teacher,1,0,0,0
-access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_teacher,1,0,0,0
+access_resource_resource,resource.resource,resource.model_resource_resource,school_link.group_school_parent,1,0,0,0

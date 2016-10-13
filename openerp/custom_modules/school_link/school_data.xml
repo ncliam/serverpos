@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data noupdate="1">
-        <!-- SMS template for OTP verify phone number -->
+        <!-- SMS template for OTP verify phone number
         <record id="registration_code_sms" model="email.template">
             <field name="name">Registration OTP</field>
             <field name="model_id" ref="website_sms_authentication.model_sms_authentication"/>
@@ -13,6 +13,20 @@
                     <p>Your code is ${object.name}"</p>
                 ]]>
             </field>
+        </record>
+        -->
+
+        <!--Scheduler send delay chat message-->
+        <record id="im_chat_delay_scheduler" model="ir.cron">
+            <field name="name" >IM Chat delay Scheduler</field>
+            <field eval="True" name="active"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+            <field eval="'im_chat.message'" name="model"></field>
+            <field eval="'broadcast_delay'" name="function"/>
+            <field name="args">()</field>
         </record>
     </data>
 </openerp>
