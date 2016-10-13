@@ -20,6 +20,7 @@
 #################################################################################
 
 import openerp
+from openerp import http
 from openerp import SUPERUSER_ID
 from openerp.http import request
 from openerp.osv import fields, osv
@@ -618,10 +619,8 @@ class im_chat_message(osv.Model):
             self.write(cr, SUPERUSER_ID, delay_ids, {'delay_time': None}, context=context)
 
 
-
-class Controller(openerp.addons.im_chat.im_chat.Controller):
-
-    @openerp.http.route('/im_chat/post_delay', type="json", auth="none")
+class Controller(http.Controller):
+    @http.route('/im_chat/post_delay', type="json", auth="none")
     def post(self, uuid, message_type, message_content, delayTime):
         registry, cr, uid, context = request.registry, request.cr, request.session.uid, request.context
         # execute the post method as SUPERUSER_ID
