@@ -266,36 +266,10 @@ class hr_employee(osv.osv):
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
 
-    def name_get(self, cr, uid, ids, context=None):
-        res = []
-        for emp in self.browse(cr, uid, ids, context=context):
-            name = emp.name
-            last = emp.last_name
-            if last:
-                name = last + " " + name
-            res.append((emp.id, name))
-        return res
-
-    def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
-        res = self.name_get(cr, uid, ids, context=context)
-        return dict(res)
-
-    def _name_search(self, cr, uid, obj, name, domain, context):
-        res = []
-        for field, operator, value in domain:
-            ids = []
-            vals = value.split()
-            for val in vals:
-                emp_ids = self.search(cr, uid, ['|',('name',operator,val),('last_name', operator, val)], context=context)
-                if emp_ids:
-                    ids.extend(emp_ids)
-
-        res.append(('id', 'in', ids))
-        return res
 
     _columns = {
         'last_name': fields.char('Last Name'),
-        'display_name': fields.function(_name_get_fnc, type="char", string='Display Name', fnct_search=_name_search),
+        'display_name': fields.char('Display Name'),
         'home_town': fields.char('Home town'),
         'home_address': fields.char('Home Address'),
         'teacher': fields.boolean('Is a Teacher'),
