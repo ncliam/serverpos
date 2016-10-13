@@ -621,7 +621,7 @@ class im_chat_message(osv.Model):
 
 class Controller(http.Controller):
     @http.route('/im_chat/post_delay', type="json", auth="none")
-    def post(self, uuid, message_type, message_content, delayTime):
+    def post_delay(self, uuid, message_type, message_content, delayTime):
         registry, cr, uid, context = request.registry, request.cr, request.session.uid, request.context
         # execute the post method as SUPERUSER_ID
         message_id = registry["im_chat.message"].post_delay(cr, openerp.SUPERUSER_ID, uid, uuid, message_type,
