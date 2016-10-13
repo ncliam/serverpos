@@ -270,7 +270,7 @@ class hr_employee(osv.osv):
         res = []
         for emp in self.browse(cr, uid, ids, context=context):
             name = emp.name
-            last = emp.parent_id
+            last = emp.last_name
             if last:
                 name = last + " " + name
             res.append((emp.id, name))
