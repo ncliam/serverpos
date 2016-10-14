@@ -468,7 +468,7 @@ class school_exam_move(osv.osv):
 
     def _get_default_teacher(self, cr, uid, context=None):
         teacher_ids = self.pool.get('hr.employee').search(cr, uid, [('teacher', '=', True), ('user_id', "=", uid)],context=context)
-        return teacher_ids and teacher_ids[0]
+        return teacher_ids and teacher_ids[0] or None
 
     _columns = {
         'name': fields.char('Name'),
@@ -477,7 +477,7 @@ class school_exam_move(osv.osv):
         'student_id': fields.many2one('hr.employee', 'Student', required=True, domain=[('student', '=', True)]),
         'mark': fields.float('Mark'),
         'date_exam': fields.datetime('Date', required=True),
-        'subject_id': fields.many2one('school.subject', 'Subject', ondelete="cascade", required=True),
+        'subject_id': fields.many2one('school.subject', 'Subject', ondelete="cascade"),
         'weight': fields.integer('Weight', help="Define weight to calculate average"),
         'type': fields.selection([
             ('w1', 'Weight 1'),
@@ -636,13 +636,3 @@ class im_chat_message(osv.Model):
 
             # Clear delaytime
             self.write(cr, SUPERUSER_ID, delay_ids, {'delay_time': None}, context=context)
-
-
-class Controller(http.Controller):
-    @http.route('/im_chat/post_delay', type="json", auth="none")
-    def post_delay(self, uuid, message_type, message_content, delayTime):
-        registry, cr, uid, context = request.registry, request.cr, request.session.uid, request.context
-        # execute the post method as SUPERUSER_ID
-        message_id = registry["im_chat.message"].post_delay(cr, openerp.SUPERUSER_ID, uid, uuid, message_type,
-                                                      message_content, delayTime, context=context)
-        return message_id

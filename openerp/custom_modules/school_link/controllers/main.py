@@ -19,6 +19,7 @@
 #
 ##############################################################################
 
+import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
 from openerp.osv import osv
@@ -26,7 +27,15 @@ from openerp.http import request
 import datetime
 from openerp.tools.translate import _
 
-class SMSRegistrationHome(http.Controller):
+class SchoolLink_Controller(http.Controller):
+
+    @http.route('/im_chat/post_delay', type="json", auth="none")
+    def post_delay(self, uuid, message_type, message_content, delayTime):
+        registry, cr, uid, context = request.registry, request.cr, request.session.uid, request.context
+        # execute the post method as SUPERUSER_ID
+        message_id = registry["im_chat.message"].post_delay(cr, openerp.SUPERUSER_ID, uid, uuid, message_type,
+                                                            message_content, delayTime, context=context)
+        return message_id
 
     @http.route('/parent_registration', type='json', auth='public')
     def parent_registration(self, mobile):
