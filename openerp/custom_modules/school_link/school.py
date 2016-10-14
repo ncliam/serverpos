@@ -568,9 +568,9 @@ class school_schedule_line(osv.osv):
             ('sat', 'Saturday'),
             ('sun', 'Sunday'),
         ], 'Week Day', required=True, select=True),
-        'class_id': fields.related('schedule_id', 'class_id', type='many2one', relation='school.class', store=True, string='Class'),
-        'subject_id': fields.many2one('school.subject', 'Subject', required=True),
-        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain="[('teacher','=',True)]"),
+        'class_id': fields.related('schedule_id', 'class_id', type='many2one', relation='school.class', store=True, string='Class', ondelete="cascade"),
+        'subject_id': fields.many2one('school.subject', 'Subject', required=True, ondelete="cascade"),
+        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain="[('teacher','=',True)]", ondelete="cascade"),
         'begin': fields.datetime('Begin', required=True),
         'end': fields.datetime('End', required=True),
     }
