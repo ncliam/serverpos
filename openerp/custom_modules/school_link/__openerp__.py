@@ -37,7 +37,7 @@ Main Features
 * 
     """,
     'author': 'ncliam',
-    'depends': ['hr', 'im_chat','auth_signup', 'website_sms_authentication_base_phone'],
+    'depends': ['multi_company','hr', 'im_chat','auth_signup', 'website_sms_authentication_base_phone'],
     'data': [
              'security/security.xml',
              'security/ir.model.access.csv',

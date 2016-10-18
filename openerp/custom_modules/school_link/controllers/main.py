@@ -37,6 +37,83 @@ class SchoolLink_Controller(http.Controller):
                                                             message_content, delayTime, context=context)
         return message_id
 
+    @http.route('/forgot_password_request', type='json', auth='public')
+    def forgot_password_request(self, model, mobile):
+        context = {}
+        hr_employee = request.registry['hr.employee']
+        res_partner = request.registry['res.partner']
+        sms_authetication = request.registry['sms.authentication']
+
+        user_id = None
+        if model:
+            if model == 'hr.employee':
+                employee_ids = hr_employee.search(request.cr, SUPERUSER_ID, [('mobile_phone',"=", mobile)], context=context)
+                employee_id = employee_ids and employee_ids[0] or None
+                if employee_id:
+                    user_id = hr_employee.browse(request.cr, SUPERUSER_ID, employee_id, context=context).user_id
+                    user_id = user_id and user_id.id or None
+            elif model == 'res.partner':
+                partner_ids = res_partner.search(request.cr, SUPERUSER_ID, [('mobile', "=", mobile), ('customer', "=", True)], context=context)
+                partner_id = partner_ids and partner_ids[0] or None
+                if partner_id:
+                    partner_id = res_partner.browse(request.cr, SUPERUSER_ID, partner_id, context=context)
+                    user_id = partner_id.parent_user_id and partner_id.parent_user_id.id or None
+
+        if not user_id:
+            raise osv.except_osv(_('Error!'), _("There is no user with this mobile number"))
+
+        token = sms_authetication.search(request.cr, SUPERUSER_ID, [('state', '=', 'sent'), ('mobile', '=', mobile)], limit=1)
+        if token and token[0]:
+            token = sms_authetication.browse(request.cr, SUPERUSER_ID, token[0])
+
+        if not token:
+            template = request.registry['ir.model.data'].get_object(request.cr, SUPERUSER_ID, 'school_link',
+                                                                    'registration_code_sms')
+
+            verfication_code_data = {
+                'mobile': mobile,
+                'res_model': 'res.users',
+                'res_id': user_id,
+                'template_id': template.id,
+            }
+            token_id = sms_authetication.create(request.cr, SUPERUSER_ID, verfication_code_data, context=context)
+            token = sms_authetication.browse(request.cr, SUPERUSER_ID, token_id, context=context)
+            token.send_code()
+
+        elif datetime.datetime.strptime(token.validity, "%Y-%m-%d %H:%M:%S") <= datetime.datetime.now():
+            token.send_new_code()
+
+        token_id = token.id
+        return token_id
+
+    @http.route('/forgot_password_verify', type='json', auth='public')
+    def forgot_password_verify(self, token_id, typing_code, mobile, password):
+        context = {}
+        res_users = request.registry['res.users']
+        sms_authetication = request.registry['sms.authentication']
+
+        if not token_id and mobile:
+            token_ids = sms_authetication.search(request.cr, SUPERUSER_ID, [('res_model','=','res.users'),('mobile', '=', mobile)], limit=1)
+            token_id = token_ids and token_ids[0] or None
+
+        if not token_id or not typing_code:
+            raise osv.except_osv(_('error!'), _("Invalid Token"))
+
+        token_ids = sms_authetication.search(request.cr, SUPERUSER_ID, [('id', '=', token_id)], limit=1)
+        token = sms_authetication.browse(request.cr, SUPERUSER_ID, token_ids[0])
+        mobile = token and token.mobile or mobile
+
+        if not token.verify_code(typing_code):
+            raise osv.except_osv(_('error!'), _("Wrong verification code"))
+
+        user_id = res_users.browse(request.cr, SUPERUSER_ID, token.res_id, context=context)
+        if user_id:
+            res_users.write(request.cr, SUPERUSER_ID, {'password': password}, context=context)
+            return True
+
+        return False
+
+
     @http.route('/parent_registration', type='json', auth='public')
     def parent_registration(self, mobile):
         context = {}
@@ -49,7 +126,7 @@ class SchoolLink_Controller(http.Controller):
         if mobile:
 
             partner_id = None
-            existed = res_partner.search_count(request.cr, SUPERUSER_ID, [('mobile',"=", mobile),('customer',"=", True)], context=context)
+            existed = res_partner.search(request.cr, SUPERUSER_ID, [('mobile',"=", mobile),('customer',"=", True)], context=context)
             if not existed:
 
                 partner_data = {
@@ -85,8 +162,6 @@ class SchoolLink_Controller(http.Controller):
 
             token_id = token.id
             return token_id
-
-
 
         raise osv.except_osv(_('error!'), _("Wrong use API"))
 

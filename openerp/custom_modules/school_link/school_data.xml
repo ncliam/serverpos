@@ -10,7 +10,7 @@
 
             <field name="body_html">
                 <![CDATA[
-                    <p>Your verification code is ${object.name}"</p>
+                    <p>Your verification code is ${object.name}</p>
                 ]]>
             </field>
         </record>

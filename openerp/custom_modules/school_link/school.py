@@ -470,9 +470,9 @@ class school_exam_move(osv.osv):
 
     _columns = {
         'name': fields.char('Name'),
-        'class_id': fields.many2one('school.class', 'Class', required=True),
-        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain=[('teacher', '=', True)]),
-        'student_id': fields.many2one('hr.employee', 'Student', required=True, domain=[('student', '=', True)]),
+        'class_id': fields.many2one('school.class', 'Class', required=True, ondelete="cascade"),
+        'teacher_id': fields.many2one('hr.employee', 'Teacher', required=True, domain=[('teacher', '=', True)], ondelete="cascade"),
+        'student_id': fields.many2one('hr.employee', 'Student', required=True, domain=[('student', '=', True)], ondelete="cascade"),
         'mark': fields.float('Mark'),
         'date_exam': fields.datetime('Date', required=True),
         'subject_id': fields.many2one('school.subject', 'Subject', ondelete="cascade"),
