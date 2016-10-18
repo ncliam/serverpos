@@ -30,10 +30,11 @@ from openerp.exceptions import except_orm
 import logging
 _logger = logging.getLogger(__name__)
 try:
-    from SOAPpy import WSDL
+    #from SOAPpy import WSDL
+    from suds.client import Client
 except :
-    _logger.warning("ERROR IMPORTING SOAPpy, if not installed, "
-                    "please install it: e.g.: apt-get install python-soappy")
+    #_logger.warning("ERROR IMPORTING SOAPpy, if not installed, ""please install it: e.g.: apt-get install python-soappy")
+    _logger.warning("ERROR IMPORTING suds, if not installed, ""please install it: e.g.: apt-get install suds")
 
 class partner_sms_send(models.Model):
     _name = "partner.sms.send"
@@ -415,24 +416,30 @@ class SMSQueue(models.Model):
             elif p.type == 'sms':
                 account = p.value
         try:
-            soap = WSDL.Proxy(self.gateway_id.url)
+            #soap = WSDL.Proxy(self.gateway_id.url)
+            wsdl = 'http://210.245.12.219:1500/SMSBRN/MTSend.asmx?wsdl'
+            client = Client(wsdl)
             message = ''
             if self.coding == '2':
                 message = str(self.msg).decode('iso-8859-1').encode('utf8')
             elif self.coding == '1':
                 message = str(self.msg)
+            else:
+                message = str(self.msg)
 
-            result = soap.SendMT(
-                destination=str(self.mobile),
-                SendFrom='VINNET',
-                KeywordName='VINNET',
-                OutContent = message,
-                ChargingFlag = '0',
-                MOSeqNo = '0',
-                TotalMessage = '1',
-                ContentType = '0',
-                SecretCode = 'vQcu4nEt23mOtPqCV'
-            )
+            #result = soap.SendMT(
+            #   destination=str(self.mobile),
+            #   SendFrom='VINNET',
+            #    KeywordName='VINNET',
+            #   OutContent = message,
+            #    ChargingFlag = '0',
+            #    MOSeqNo = '0',
+            #    TotalMessage = '1',
+            #    ContentType = '0',
+            #    SecretCode = 'vQcu4nEt23mOtPqCV'
+            #)
+
+            result = client.service.SendMT(str(self.mobile), 'VINNET', 'VINNET', message, '0', '0', '1', '0','vQcu4nEt23mOtPqCV')
 
             self.state = 'send'
             ### End of the new process ###
