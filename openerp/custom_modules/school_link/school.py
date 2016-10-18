@@ -35,9 +35,7 @@ class email_template(osv.osv):
 
     def _get_default_gateway(self, cr, uid, context=None):
         gateway_id = self.pool.get('sms.smsclient').search(cr, uid, [], context=context, limit=1)
-        if not gateway_id:
-            raise osv.except_osv(_('Error!'), _('There is no default gateway for the current user!'))
-        return gateway_id[0]
+        return gateway_id and gateway_id[0] or None
 
     _defaults = {
         'sms_template': True,
@@ -342,7 +340,7 @@ class school_scholarity(osv.osv):
 
     _columns = {
         'name': fields.char('Scholarity Year', required=True),
-        'company_id':fields.many2one('res.company', 'School', required=True, domain="[('school','=',True)]"),
+        'company_id':fields.many2one('res.company', 'School', domain="[('school','=',True)]"),
         'date_start': fields.datetime('Start Date', required=True),
         'date_end': fields.datetime('End Date', required=True),
         'active': fields.function(_is_active, store=False, string='Active', type='boolean'),
@@ -628,11 +626,14 @@ class im_chat_message(osv.Model):
                 data = self.read(cr, SUPERUSER_ID, [message_id], ['from_id', 'to_id', 'create_date', 'type', 'message'],
                                  context=context)[0]
                 uuid = data['to_id']
-                session = self.pool['im_chat.session'].browse(cr, SUPERUSER_ID, uuid, context=context)
-                notifications.append([uuid, data])
-                for user in session.user_ids:
-                    notifications.append([(cr.dbname, 'im_chat.session', user.id), data])
-                self.pool['bus.bus'].sendmany(cr, uid, notifications)
+                session_ids = self.pool['im_chat.session'].search(cr, SUPERUSER_ID, [('uuid','=', uuid)], context=context, limit=1)
+                session_id = session_ids and session_ids[0] or None
+                if session_id:
+                    session = self.pool['im_chat.session'].browse(cr, SUPERUSER_ID, session_id, context=context)
+                    notifications.append([uuid, data])
+                    for user in session.user_ids:
+                        notifications.append([(cr.dbname, 'im_chat.session', user.id), data])
+                    self.pool['bus.bus'].sendmany(cr, uid, notifications)
 
             # Clear delaytime
             self.write(cr, SUPERUSER_ID, delay_ids, {'delay_time': None}, context=context)

@@ -59,6 +59,8 @@ class SchoolLink_Controller(http.Controller):
                     'customer': True,
                 }
                 partner_id = res_partner.create(request.cr, SUPERUSER_ID, partner_data, context=context)
+            else:
+                parner_id = existed and existed[0] or None
 
             token = sms_authetication.search(request.cr, SUPERUSER_ID, [('state', '=', 'sent'),('mobile','=', mobile)], limit=1)
             if token and token[0]:
