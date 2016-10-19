@@ -126,14 +126,15 @@ class SchoolLink_Controller(http.Controller):
         if mobile:
 
             partner_id = None
-            existed = res_partner.search(request.cr, SUPERUSER_ID, [('mobile',"=", mobile),('customer',"=", True)], context=context)
+            existed = res_partner.search(request.cr, SUPERUSER_ID, [('mobile',"=", mobile),('customer',"=", False)], context=context)
             if not existed:
 
                 partner_data = {
-                    'name': _('Mobile user Mapping'),
+                    'name': mobile,
                     'mobile': mobile,
+                    'email': mobile,
                     'company_id': company_id,
-                    'customer': True,
+                    'customer': False,
                 }
                 partner_id = res_partner.create(request.cr, SUPERUSER_ID, partner_data, context=context)
             else:

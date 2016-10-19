@@ -103,6 +103,7 @@ class res_user(osv.osv):
             company_id = self.pool.get('res.company').browse(cr, SUPERUSER_ID, school, context=context)
             if company_id:
                 user_data = {
+                    'company_id': company_id.id,
                     'company_ids': [(6, 0, [company_id.id])],
                 }
                 self.pool.get("res.users").write(cr, SUPERUSER_ID, uid, user_data, context=context)
@@ -210,6 +211,21 @@ class res_partner(osv.osv):
     _columns = {
         'children': fields.many2many('hr.employee', 'parent_student_rel', 'student_id', 'partner_id', 'Childs', readonly=True),
         'parent_user_id': fields.function(get_parent_user, relation='res.users', type='many2one', string='Related User', readonly=True),
+
+        'property_account_payable': fields.property(
+            type='many2one',
+            relation='account.account',
+            string="Account Payable",
+            domain="[('type', '=', 'payable')]",
+            help="This account will be used instead of the default one as the payable account for the current partner",
+            required=False),
+        'property_account_receivable': fields.property(
+            type='many2one',
+            relation='account.account',
+            string="Account Receivable",
+            domain="[('type', '=', 'receivable')]",
+            help="This account will be used instead of the default one as the receivable account for the current partner",
+            required=False),
     }
 
     def create_multi(self, cr, uid, datas, context=None):
@@ -248,8 +264,15 @@ class res_company(osv.osv):
 
         return childs
 
-    
+    def name_get(self, cr, uid, ids, context=None):
+        return super(res_company, self).name_get(cr, SUPERUSER_ID, ids, context=context)
+
+    def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
+        res = self.name_get(cr, uid, ids, context=context)
+        return dict(res)
+
     _columns = {
+        'display_name': fields.function(_name_get_fnc, type="char", string='Display Name', store=True),
         'school': fields.boolean('School'),
         'children': fields.function(get_study_child, relation='hr.employee', type='many2many', string='Childs in study', readonly=True),
     }
@@ -266,7 +289,7 @@ class hr_employee(osv.osv):
 
     def name_get(self, cr, uid, ids, context=None):
         res = []
-        for emp in self.browse(cr, uid, ids, context=context):
+        for emp in self.browse(cr, SUPERUSER_ID, ids, context=context):
             name = emp.name
             last = emp.last_name
             if last:
