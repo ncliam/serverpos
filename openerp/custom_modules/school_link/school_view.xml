@@ -39,6 +39,10 @@
                         <group>
                             <field name="class_ids" attrs="{'invisible':[('student','=',False)]}" />
                         </group>
+                        <group attrs="{'invisible':[('teacher','=',False)]}">
+                            <field name="teaching_class_ids"  />
+                            <field name="subject_ids"  />
+                        </group>
                     </page>
                 </xpath>
             </field>

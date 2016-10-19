@@ -301,6 +301,36 @@ class hr_employee(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+    def get_teach_subjects(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for emp in self.browse(cr, uid, ids, context=context):
+            subjects = []
+            schedule_line_ids = self.pool.get('school.schedule.line').search(cr, uid, [('teacher_id','=', emp.id),('class_id.active','=',True)], context=context)
+            if schedule_line_ids:
+                for schedule_line in self.pool.get('school.schedule.line').browse(cr, uid, schedule_line_ids, context=context):
+                    if schedule_line.subject_id:
+                        subjects.append(schedule_line.subject_id.id)
+
+            subjects = self.pool.get('school.subject').search(cr, uid, [('id','in', subjects)], context=context)
+            res[emp.id] = subjects
+        return res
+
+
+    def get_teach_classes(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for emp in self.browse(cr, uid, ids, context=context):
+            classes = []
+            schedule_line_ids = self.pool.get('school.schedule.line').search(cr, uid, [('teacher_id', '=', emp.id),
+                                                                                       ('class_id.active', '=', True)],
+                                                                             context=context)
+            if schedule_line_ids:
+                for schedule_line in self.pool.get('school.schedule.line').browse(cr, uid, schedule_line_ids, context=context):
+                        classes.append(schedule_line.class_id.id)
+
+            classes = self.pool.get('school.class').search(cr, uid, [('id','in', classes)], context=context)
+            res[emp.id] = classes
+        return res
+
 
     _columns = {
         'last_name': fields.char('Last Name'),
@@ -311,6 +341,9 @@ class hr_employee(osv.osv):
         'student': fields.boolean('Is a Student'),
         'parent_ids': fields.many2many('res.partner', 'parent_student_rel', 'partner_id', 'student_id', 'Parents'),
         'class_ids': fields.many2many('school.class', 'school_class_student_rel', 'student_id', 'class_id', 'Classes', domain="[('active','=',True)]"),
+        'subject_ids': fields.function(get_teach_subjects, relation='school.subject', type='many2many', string='Teaching Subjects', readonly=True),
+        'teaching_class_ids': fields.function(get_teach_classes, relation='school.class', type='many2many', string='Teaching Classes', readonly=True),
+
     }
 
     _defaults = {
