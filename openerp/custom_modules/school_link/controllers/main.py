@@ -118,7 +118,7 @@ class SchoolLink_Controller(http.Controller):
         return False
 
 
-    @http.route('/parent_registration', type='http', auth='none')
+    @http.route('/parent_registration', type='json', auth='none')
     def parent_registration(self, mobile, country_code=None):
         context = {}
         registry = request.registry
