@@ -416,7 +416,7 @@ class school_scholarity(osv.osv):
             where = ""
             assert value in (True, False), 'Operation not supported'
             now = datetime.datetime.now().strftime(DATETIME_FORMAT)
-            if value == True:
+            if (operator == '=' and value == True) or (operator == '!=' and value == False):
                 where = " WHERE date_start <= '%s' AND date_end >= '%s'" % (now, now)
             else:
                 where = " WHERE date_start > '%s' OR date_end < '%s'" % (now, now)
