@@ -30,6 +30,26 @@ import datetime
 
 from ast import literal_eval
 
+class sms_authentication(osv.osv):
+    _name = 'sms.authentication'
+    _inherit = ['sms.authentication', 'phone.common']
+    _phone_fields = ['mobile']
+    _phone_name_sequence = 10
+    _country_field = None
+    _partner_field = None
+
+    def create(self, cr, uid, vals, context=None):
+        vals_reformated = self._generic_reformat_phonenumbers(
+            cr, uid, None, vals, context=context)
+        return super(sms_authentication, self).create(
+            cr, uid, vals_reformated, context=context)
+
+    def write(self, cr, uid, ids, vals, context=None):
+        vals_reformated = self._generic_reformat_phonenumbers(
+            cr, uid, ids, vals, context=context)
+        return super(sms_authentication, self).write(
+            cr, uid, ids, vals_reformated, context=context)
+
 class email_template(osv.osv):
     _inherit = "email.template"
 
@@ -279,13 +299,30 @@ class res_company(osv.osv):
 
 
 class hr_employee(osv.osv):
-    _inherit = "hr.employee"
+    _name = "hr.employee"
+    _inherit = ['hr.employee', 'phone.common']
+    _phone_fields = ['work_phone', 'mobile_phone']
+    _phone_name_sequence = 10
+    _country_field = None
+    _partner_field = None
 
     def _get_default_company(self, cr, uid, context=None):
         company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
         if not company_id:
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
+
+    def create(self, cr, uid, vals, context=None):
+        vals_reformated = self._generic_reformat_phonenumbers(
+            cr, uid, None, vals, context=context)
+        return super(hr_employee, self).create(
+            cr, uid, vals_reformated, context=context)
+
+    def write(self, cr, uid, ids, vals, context=None):
+        vals_reformated = self._generic_reformat_phonenumbers(
+            cr, uid, ids, vals, context=context)
+        return super(hr_employee, self).write(
+            cr, uid, ids, vals_reformated, context=context)
 
     def name_get(self, cr, uid, ids, context=None):
         res = []
