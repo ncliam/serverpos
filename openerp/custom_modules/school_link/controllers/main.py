@@ -42,7 +42,7 @@ class SchoolLink_Controller(http.Controller):
     def forgot_password_request(self, model, mobile):
         context = {}
         registry = request.registry
-        cr = registry.cursor()
+        cr = request.cr
         hr_employee = registry['hr.employee']
         res_partner = registry['res.partner']
         sms_authetication = registry['sms.authentication']
@@ -92,7 +92,7 @@ class SchoolLink_Controller(http.Controller):
     def forgot_password_verify(self, token_id, typing_code, mobile, password):
         context = {}
         registry = request.registry
-        cr = registry.cursor()
+        cr = request.cr
         res_users = registry['res.users']
         sms_authetication = registry['sms.authentication']
 
@@ -118,11 +118,11 @@ class SchoolLink_Controller(http.Controller):
         return False
 
 
-    @http.route('/parent_registration', type='json', auth='none')
+    @http.route('/parent_registration', type='http', auth='none')
     def parent_registration(self, mobile, country_code=None):
         context = {}
         registry = request.registry
-        cr = registry.cursor()
+        cr = request.cr
         company_id = registry['res.users']._get_company(cr, SUPERUSER_ID, context=context)
         if not country_code:
             country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
@@ -168,6 +168,7 @@ class SchoolLink_Controller(http.Controller):
                 token.send_code()
 
             token_id = token.id
+            cr.commit()
             return token_id
 
         raise osv.except_osv(_('error!'), _("Wrong use API"))
@@ -177,7 +178,7 @@ class SchoolLink_Controller(http.Controller):
     def parent_number_verify(self, token_id, typing_code, mobile, password, country_code=None):
         context = {}
         registry = request.registry
-        cr = registry.cursor()
+        cr = request.cr
         res_users = registry['res.users']
         res_partner = registry['res.partner']
         sms_authetication = registry['sms.authentication']
@@ -230,7 +231,7 @@ class SchoolLink_Controller(http.Controller):
     @http.route('/parent_send_new_code', type='json', auth='none')
     def parent_send_new_code(self, token_id):
         registry = request.registry
-        cr = registry.cursor()
+        cr = request.cr
         token_ids = registry['sms.authentication'].search(cr, SUPERUSER_ID, [('id', '=', token_id)], limit=1)
         token = registry['sms.authentication'].browse(cr, SUPERUSER_ID, token_ids[0])
         if token:
