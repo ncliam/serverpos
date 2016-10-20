@@ -168,7 +168,6 @@ class SchoolLink_Controller(http.Controller):
                 token.send_code()
 
             token_id = token.id
-            cr.commit()
             return token_id
 
         raise osv.except_osv(_('error!'), _("Wrong use API"))
@@ -206,10 +205,7 @@ class SchoolLink_Controller(http.Controller):
             if not user_id:
 
                 partner_id = res_partner.browse(cr, SUPERUSER_ID, token.res_id, context=context)
-
-                group_ids = []
                 dummy, group_id = registry["ir.model.data"].get_object_reference(cr, SUPERUSER_ID, 'school_link','group_school_parent')
-                group_ids.append(group_id)
 
                 user_data = {
                     'name': partner_id and partner_id.name or mobile,
@@ -218,7 +214,7 @@ class SchoolLink_Controller(http.Controller):
                     'password': password,
                     'company_id': company_id,
                     'company_ids': [(6, 0, [company_id])],
-                    'group_id': [(6, 0, group_ids)],
+                    'groups_id': [(6, 0, [group_id])],
 
                 }
                 user_id = res_users.create(cr, SUPERUSER_ID, user_data, context=context)
