@@ -39,9 +39,9 @@ class SchoolLink_Controller(http.Controller):
         return message_id
 
     @http.route('/forgot_password_request', type='json', auth='none')
-    def forgot_password_request(self, db, model, mobile):
+    def forgot_password_request(self, model, mobile):
         context = {}
-        registry = openerp.modules.registry.RegistryManager.get(db)
+        registry = request.registry
         cr = registry.cursor()
         hr_employee = registry['hr.employee']
         res_partner = registry['res.partner']
@@ -89,9 +89,9 @@ class SchoolLink_Controller(http.Controller):
         return token_id
 
     @http.route('/forgot_password_verify', type='json', auth='none')
-    def forgot_password_verify(self, db, token_id, typing_code, mobile, password):
+    def forgot_password_verify(self, token_id, typing_code, mobile, password):
         context = {}
-        registry = openerp.modules.registry.RegistryManager.get(db)
+        registry = request.registry
         cr = registry.cursor()
         res_users = registry['res.users']
         sms_authetication = registry['sms.authentication']
@@ -119,9 +119,9 @@ class SchoolLink_Controller(http.Controller):
 
 
     @http.route('/parent_registration', type='json', auth='none')
-    def parent_registration(self, db, mobile, country_code=None):
+    def parent_registration(self, mobile, country_code=None):
         context = {}
-        registry = openerp.modules.registry.RegistryManager.get(db)
+        registry = request.registry
         cr = registry.cursor()
         company_id = registry['res.users']._get_company(cr, SUPERUSER_ID, context=context)
         if not country_code:
@@ -174,9 +174,9 @@ class SchoolLink_Controller(http.Controller):
 
 
     @http.route('/parent_number_verify', type='json', auth='none')
-    def parent_number_verify(self, db, token_id, typing_code, mobile, password, country_code=None):
+    def parent_number_verify(self, token_id, typing_code, mobile, password, country_code=None):
         context = {}
-        registry = openerp.modules.registry.RegistryManager.get(db)
+        registry = request.registry
         cr = registry.cursor()
         res_users = registry['res.users']
         res_partner = registry['res.partner']
@@ -228,8 +228,8 @@ class SchoolLink_Controller(http.Controller):
 
 
     @http.route('/parent_send_new_code', type='json', auth='none')
-    def parent_send_new_code(self, db, token_id):
-        registry = openerp.modules.registry.RegistryManager.get(db)
+    def parent_send_new_code(self, token_id):
+        registry = request.registry
         cr = registry.cursor()
         token_ids = registry['sms.authentication'].search(cr, SUPERUSER_ID, [('id', '=', token_id)], limit=1)
         token = registry['sms.authentication'].browse(cr, SUPERUSER_ID, token_ids[0])

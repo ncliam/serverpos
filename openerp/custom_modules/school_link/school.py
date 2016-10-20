@@ -19,10 +19,8 @@
 #
 #################################################################################
 
-import openerp
-from openerp import http
+from openerp import tools
 from openerp import SUPERUSER_ID
-from openerp.http import request
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
@@ -412,6 +410,22 @@ class school_scholarity(osv.osv):
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
 
+    def _search_active(self, cr, uid, obj, name, args, context):
+        res = []
+        for field, operator, value in args:
+            where = ""
+            assert value in (True, False), 'Operation not supported'
+            now = datetime.datetime.now().strftime(DATETIME_FORMAT)
+            if value == True:
+                where = " WHERE date_start <= '%s' AND date_end >= '%s'" % (now, now)
+            else:
+                where = " WHERE date_start > '%s' OR date_end < '%s'" % (now, now)
+
+            cr.execute('select id FROM school_scholarity %s' % (where,))
+            res_ids = [x[0] for x in cr.fetchall()]
+            res.append(('id', "in", res_ids))
+        return res
+
 
     def _is_active(self, cr, uid, ids, field_name, arg, context=None):
         res = {}
@@ -436,7 +450,7 @@ class school_scholarity(osv.osv):
         'company_id':fields.many2one('res.company', 'School', domain="[('school','=',True)]"),
         'date_start': fields.datetime('Start Date', required=True),
         'date_end': fields.datetime('End Date', required=True),
-        'active': fields.function(_is_active, store=False, string='Active', type='boolean'),
+        'active': fields.function(_is_active, store=False, string='Active', type='boolean', fnct_search=_search_active),
     }
 
     _defaults = {
