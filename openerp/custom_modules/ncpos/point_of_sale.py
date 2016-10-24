@@ -356,4 +356,17 @@ class stock_production_lot(osv.osv):
             
         return recs.name_get()
 
+class stock_inventory_report(osv.osv_memory):
+
+    _inherit = 'stock.inventory.report'
+    
+    def get_inventory_lines(self, cr, uid, form, context=None):
+        data = []
+        ir_obj = self.pool.get('ir.actions.report.xml')
+        
+        new_report = ir_obj._lookup_report(cr, 'stock_inventory_report')
+        if new_report:            
+            oo_parser = new_report.parser(cr, uid, 'stock_inventory_report', context=context)
+            return oo_parser.get_lines(form)
+        return data  
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
