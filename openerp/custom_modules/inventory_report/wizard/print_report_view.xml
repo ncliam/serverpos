@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="wizard_stock_inventory_report" model="ir.ui.view">
+			<field name="name">wizard.stock.inventory.report</field>
+			<field name="model">stock.inventory.report</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Report Options">
+					
+					<group col="2" colspan="2">
+						<field name="date_from" />
+						<field name="date_to" />
+						<field name="location_id" />
+                        <newline />
+                        <button string="Cancel" special="cancel" icon="gtk-cancel" />
+                        <button name="print_report" string="Print" type="object" icon="gtk-print" default_focus="1" />
+                        
+                    </group>
+				</form>
+			</field>
+		</record>
+
+
+
+        <record id="action_wizard_stock_inventory_report" model="ir.actions.act_window">
+            <field name="name">Stock Inventory Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.inventory.report</field>
+            <field name="res_model">stock.inventory.report</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+        </record>
+        <menuitem action="action_wizard_stock_inventory_report"
+                  id="menu_action_wizard_sale_report_inventory"
+                  parent="stock.next_id_61" sequence="2" />
+
+
+
+	</data>
+</openerp>
