@@ -790,10 +790,15 @@ class im_chat_message(osv.Model):
                 "message": _('You have just sent a timer message.'),
                 "self_notify": True,
             }
-            # save it & broastcast later
-            self.create(cr, uid, vals, context=context)
+            # Create self notification first
+            message_id = self.create(cr, uid, vals, context=context)
+            # broadcast it to channel (anonymous users) and users_ids
+            data = self.read(cr, uid, [message_id], ['from_id', 'to_id', 'create_date', 'type', 'message'], context=context)[0]
+            notifications.append([uuid, data])
+            notifications.append([(cr.dbname, 'im_chat.session', uid), data])
+            self.pool['bus.bus'].sendmany(cr, uid, notifications)
 
-            # build the new message
+            # build the timer message
             vals = {
                 "from_id": from_uid,
                 "to_id": session.id,
