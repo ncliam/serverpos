@@ -4,7 +4,7 @@
 {
 
     'name': 'Password Security',
-    "summary": "Allow admin to set password security requirements.",
+    "summary": "Allow admin to set password security requirements. Fix for Odoo 8 by ncliam",
     'version': '9.0.1.0.1',
     'author': "LasLabs",
     'category': 'Base',

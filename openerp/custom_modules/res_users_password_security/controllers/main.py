@@ -9,9 +9,6 @@ from openerp.http import request
 from openerp.addons.auth_signup.controllers.main import AuthSignupHome
 from openerp.addons.web.controllers.main import ensure_db, Session
 
-from ..exceptions import PassError
-
-
 class PasswordSecuritySession(Session):
 
     @http.route('/web/session/change_password', type='json', auth="user")
@@ -59,7 +56,7 @@ class PasswordSecurityHome(AuthSignupHome):
             return super(PasswordSecurityHome, self).web_auth_signup(
                 *args, **kw
             )
-        except PassError, e:
+        except Exception, e:
             qcontext = self.get_auth_signup_qcontext()
             qcontext['error'] = _(e.message)
             return request.render('auth_signup.signup', qcontext)

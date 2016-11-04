@@ -6,8 +6,7 @@ from datetime import datetime, timedelta
 import re
 
 from openerp import api, fields, models, _
-from openerp.addons.res_users_password_security.exceptions import PassError
-
+from openerp.osv import osv
 
 def delta_now(**kwargs):
     dt = datetime.now() + timedelta(**kwargs)
@@ -64,13 +63,17 @@ class ResUsers(models.Model):
             password_regex.append(r'(?=.*?\W)')
         password_regex.append('.{%d,}$' % company_id.password_length)
         if not re.search(''.join(password_regex), password):
-            raise PassError(_(self.password_match_message()))
+            raise osv.except_osv(_('Error!'), _(self.password_match_message()))
         return True
 
     @api.multi
     def _password_has_expired(self, ):
-        if not self.password_write_date:
+        if self.self.company_id.password_expiration == 0:
+            return False
+
+        if self.password_write_date:
             return True
+
         write_date = fields.Datetime.from_string(self.password_write_date)
         today = fields.Datetime.from_string(fields.Datetime.now())
         days = (today - write_date).days
