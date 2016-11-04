@@ -19,7 +19,6 @@
 #
 #################################################################################
 
-from openerp import tools
 from openerp import SUPERUSER_ID
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
@@ -27,6 +26,36 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 import datetime
 
 from ast import literal_eval
+
+class im_chat_session(osv.osv):
+    _inherit = 'im_chat.session'
+
+    def add_user(self, cr, uid, uuid, user_id, context=None):
+        """ add the given user to the given session """
+        sids = self.search(cr, uid, [('uuid', '=', uuid)], context=context, limit=1)
+        for session in self.browse(cr, uid, sids, context=context):
+            if user_id not in [u.id for u in session.user_ids]:
+                self.write(cr, uid, [session.id], {'user_ids': [(4, user_id)]}, context=context)
+                # notify the all the channel users and anonymous channel
+                notifications = []
+                for channel_user_id in session.user_ids:
+                    info = self.session_info(cr, channel_user_id.id, [session.id], context=context)
+                    notifications.append([(cr.dbname, 'im_chat.session', channel_user_id.id), info])
+                # Anonymous are not notified when a new user is added : cannot exec session_info as uid = None
+                info = self.session_info(cr, SUPERUSER_ID, [session.id], context=context)
+                notifications.append([session.uuid, info])
+                self.pool['bus.bus'].sendmany(cr, uid, notifications)
+                # send a message to the conversation
+                user = self.pool['res.users'].browse(cr, uid, user_id, context=context)
+                chat_names = self.pool['res.users'].get_chat_name(cr, uid, [user.id], context=context)
+                notify_msg = _('%s joined the conversation.') % (chat_names[user.id] or user.name)
+                self.pool["im_chat.message"].post(cr, uid, uid, session.uuid, "meta", notify_msg, context=context)
+
+    def users_infos(self, cr, uid, ids, context=None):
+        """ get the user infos for all the user in the session """
+        for session in self.pool["im_chat.session"].browse(cr, SUPERUSER_ID, ids, context=context):
+            users_infos = self.pool["res.users"].read(cr, SUPERUSER_ID, [u.id for u in session.user_ids], ['id','name', 'im_status'], context=context)
+            return users_infos
 
 class sms_authentication(osv.osv):
     _name = 'sms.authentication'
@@ -134,21 +163,29 @@ class res_user(osv.osv):
         result = {}
         for user_id in user_ids:
             user = self.browse(cr, SUPERUSER_ID, user_id, context=context)
+            company_id = user.company_id.id
             name = user.name
 
-            employee_ids = self.pool.get('hr.employee').search(cr, uid, [("user_id",'=', user_id)], context=context)
+            employee_ids = self.pool.get('hr.employee').search(cr, SUPERUSER_ID, [("user_id",'=', user_id)], context=context)
             employee_id = employee_ids and employee_ids[0] or None
 
             if not employee_id:
                 mobile = user.partner_id.mobile
                 if mobile:
-                    parent_ids = self.pool.get('res.partner').search(cr, uid, [("mobile", '=', mobile),('customer','=', True)], context=context)
+                    # search parent in school
+                    parent_ids = self.pool.get('res.partner').search(cr, SUPERUSER_ID, [("mobile", '=', mobile),
+                                                                                        ('customer','=', True),
+                                                                                        ('company_id','=', company_id)], context=context)
+                    if not parent_ids or len(parent_ids) == 0:
+                        # search parent not in school
+                        parent_ids = self.pool.get('res.partner').search(cr, SUPERUSER_ID, [("mobile", '=', mobile),
+                                                                                            ('customer', '=', True)], context=context)
                     parent_id = parent_ids and parent_ids[0] or None
                     if parent_id:
-                        parent = self.pool.get('res.partner').browse(cr, uid, parent_id, context=context)
+                        parent = self.pool.get('res.partner').browse(cr, SUPERUSER_ID, parent_id, context=context)
                         name = parent.name
             else:
-                employee = self.pool.get('hr.employee').browse(cr, uid, employee_id, context=context)
+                employee = self.pool.get('hr.employee').browse(cr, SUPERUSER_ID, employee_id, context=context)
                 name = employee.name
 
             result[user_id] = name
@@ -475,6 +512,21 @@ class school_class_group(osv.osv):
     _defaults = {
         'company_id': _get_default_company,
     }
+
+    def _check_duplicate(self, cr, uid, ids, context=None):
+        for group in self.browse(cr, uid, ids, context=None):
+            domain = [
+                ('name', '=', group.name),
+                ('company_id','=', group.company_id.id)
+            ]
+            count = self.search_count(cr, uid, domain, context=context)
+            if count > 1:
+                return False
+        return True
+
+    _constraints = [
+        (_check_duplicate, 'Duplicate group name',['name']),
+    ]
     
 class school_subject(osv.osv):
     _name = 'school.subject'
@@ -500,10 +552,10 @@ class school_subject(osv.osv):
         for subject in self.browse(cr, uid, ids, context=None):
             domain = [
                 ('name', '=', subject.name),
-                ('company_id','=', subject.company_id.id)
+                ('company_id','=', subject.company_id and subject.company_id.id or False)
             ]
             count = self.search_count(cr, uid, domain, context=context)
-            if count>1:
+            if count > 1:
                 return False
         return True
 
@@ -550,7 +602,19 @@ class school_class(osv.osv):
             res[class_id.id] = all_parent_ids
 
         return res
-    
+
+    def _check_duplicate(self, cr, uid, ids, context=None):
+        for school_class in self.browse(cr, uid, ids, context=None):
+            domain = [
+                ('name', '=', school_class.name),
+                ('year_id', '=', school_class.year_id.id)
+                ('company_id','=', school_class.company_id.id)
+            ]
+            count = self.search_count(cr, uid, domain, context=context)
+            if count > 1:
+                return False
+        return True
+
     _columns = {
         'name': fields.char('Name', required=True),
         'year_id':fields.many2one('school.scholarity', 'Year', required=True),
@@ -562,6 +626,10 @@ class school_class(osv.osv):
         'teacher_ids': fields.function(_get_all_teachers, relation='hr.employee', type='many2many', string='Teachers',readonly=True),
         'parent_ids': fields.function(_get_all_parents, relation='res.partner', type='many2many', string='Parents', readonly=True),
     }
+
+    _constraints = [
+        (_check_duplicate, 'Duplicate class name', ['name']),
+    ]
 
     _defaults = {
         'company_id': _get_default_company,

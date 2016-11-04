@@ -112,6 +112,7 @@ class SchoolLink_Controller(http.Controller):
 
         user_id = res_users.browse(cr, SUPERUSER_ID, token.res_id, context=context)
         if user_id:
+            res_users.check_password(cr, user_id, password, context=context)
             res_users.write(cr, SUPERUSER_ID, user_id.id, {'password': password}, context=context)
             return True
 
