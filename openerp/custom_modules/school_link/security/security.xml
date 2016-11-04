@@ -106,9 +106,21 @@
 			<field name="global" eval="True" />
 			<field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
 		</record>
+
+		<record id="message_rule_private" model="ir.rule">
+            <field name="name">Private message only can see by author</field>
+            <field name="model_id" ref="im_chat.model_im_chat_message"/>
+            <field name="groups" eval="[(6,0,[ref('base.group_user')])]"/>
+            <field name="domain_force">[('self_notify','=', True),('from_id', '=', user.id)]</field>
+            <field name="perm_unlink" eval="0"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_create" eval="1"/>
+        </record>
     
     </data>
 	<data noupdate="1">
+		<!--
 		 <record id="dummy" model="res.users">
 			<field name="name">Dummy User</field>
 			<field name="login">dummy</field>
@@ -116,5 +128,6 @@
 			<field name="groups_id" eval="[(6,0,[ref('base.group_user')])]"/>
 			<field name="image" type="base64" file="base/static/img/user_demo-image.jpg"/>
 		 </record>
+		 -->
 	</data>
 </openerp>

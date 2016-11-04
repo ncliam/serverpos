@@ -759,6 +759,11 @@ class im_chat_message(osv.Model):
 
     _columns = {
         'delay_time': fields.datetime('Delay Time'),
+        'self_notify': fields.boolean("Is Self Notification"),
+    }
+
+    _defaults = {
+        'self_notify': False,
     }
 
     def get_messages(self, cr, uid, uuid, last_id=False, limit=20, context=None):
@@ -778,6 +783,16 @@ class im_chat_message(osv.Model):
         session_ids = Session.search(cr, uid, [('uuid','=',uuid)], context=context)
         notifications = []
         for session in Session.browse(cr, uid, session_ids, context=context):
+            vals = {
+                "from_id": from_uid,
+                "to_id": session.id,
+                "type": message_type,
+                "message": _('You have just sent a timer message.'),
+                "self_notify": True,
+            }
+            # save it & broastcast later
+            self.create(cr, uid, vals, context=context)
+
             # build the new message
             vals = {
                 "from_id": from_uid,
