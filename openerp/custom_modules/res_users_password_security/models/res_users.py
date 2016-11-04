@@ -68,7 +68,7 @@ class ResUsers(models.Model):
 
     @api.multi
     def _password_has_expired(self, ):
-        if self.self.company_id.password_expiration == 0:
+        if self.company_id.password_expiration == 0:
             return False
 
         if self.password_write_date:
