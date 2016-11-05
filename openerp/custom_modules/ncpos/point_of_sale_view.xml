@@ -68,5 +68,21 @@
 	            </field>
             </field>
         </record>
+
+         <!-- Top menu item -->
+        <record model="ir.ui.view" id="view_pos_config_form">
+            <field name="name">pos.config.form.view</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_config_form" />
+            <field name="arch" type="xml">
+                <field name="receipt_header" position="before">
+                    <field name="template_name" invisible="1" />
+                    <field name="receipt_template" filename="template_name"/>
+                </field>
+                <field name="barcode_price" position="after">
+                    <field name="barcode_product_lot" />
+                </field>
+            </field>
+        </record>
     </data>
 </openerp>

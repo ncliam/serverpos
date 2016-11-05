@@ -33,6 +33,19 @@ import openerp.addons.decimal_precision as dp
 from openerp.addons.point_of_sale.report.pos_details import pos_details
 _logger = logging.getLogger(__name__)
 
+class pos_config(osv.osv):
+    _inherit = 'pos.config'
+
+    _columns = {
+        'barcode_product_lot':  fields.char('Lot.No Barcodes', size=64, help='The pattern that identifies product barcodes with Lot No'),
+        'template_name': fields.char('Template File Name'),
+        'receipt_template': fields.binary('Receipt Template File'),
+    }
+
+    _defaults = {
+        'barcode_product_lot': '24xxxxxNNNNN',
+    }
+
 class pos_session(osv.osv):
     _inherit = 'pos.session'
     

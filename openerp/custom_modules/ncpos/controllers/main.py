@@ -178,7 +178,7 @@ class pos_registration(osv.osv):
                     'login': reg.email,
                     'company_id': company_id,
                     'company_ids': [(6,0,[company_id])],
-                    'group_id': [(6,0,[group_ids])],
+                    'group_id': [(6,0,group_ids)],
                     
                 }
                 user_id = self.pool.get("res.users").create(cr, uid, user_data, context=context)
