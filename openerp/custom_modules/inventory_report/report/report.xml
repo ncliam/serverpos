@@ -9,8 +9,8 @@
         <field name="report_name">stock_inventory_report</field>
         <field name="report_type">aeroo</field>
         <field name="in_format">oo-ods</field>
-        <field name="parser_loc">pos_chi_my/report/inventory.py</field>
-        <field name="report_rml">pos_chi_my/report/inventory.ods</field>
+        <field name="parser_loc">inventory_report/report/inventory.py</field>
+        <field name="report_rml">inventory_report/report/inventory.ods</field>
         <field name="parser_state">loc</field>
         <field name="tml_source">file</field>
     </record>

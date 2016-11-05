@@ -2,13 +2,7 @@ import logging
 logger = logging.getLogger('report_aeroo')
 
 from openerp.report import report_sxw
-from openerp.report.report_sxw import rml_parse
-import random
-import time
-import re
-import datetime
-from dateutil.relativedelta import relativedelta
-from operator import itemgetter
+
 
 class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):

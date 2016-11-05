@@ -20,11 +20,7 @@
 ##############################################################################
 
 from openerp.osv import fields, osv
-from openerp.tools.translate import _
-from openerp.tools.safe_eval import safe_eval as eval
-import openerp.addons.decimal_precision as dp
-from openerp.tools.float_utils import float_round
-from openerp.exceptions import UserError
+
 import time
 
 class stock_inventory_report(osv.osv_memory):
