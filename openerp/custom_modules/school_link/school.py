@@ -23,7 +23,7 @@ from openerp import SUPERUSER_ID
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
-import datetime
+import pytz, datetime
 
 from ast import literal_eval
 
@@ -795,10 +795,23 @@ class im_chat_message(osv.Model):
             # broadcast it to channel (anonymous users) and users_ids
             data = self.read(cr, uid, [message_id], ['from_id', 'to_id', 'create_date', 'type', 'message'], context=context)[0]
             notifications.append([uuid, data])
-            notifications.append([(cr.dbname, 'im_chat.session', uid), data])
+            notifications.append([(cr.dbname, 'im_chat.session', from_uid), data])
             self.pool['bus.bus'].sendmany(cr, uid, notifications)
 
             # build the timer message
+            if context and context.get('tz'):
+                tz_name = context['tz']
+            else:
+                user = self.pool['res.users'].browse(cr, SUPERUSER_ID, uid)
+                tz_name = user.tz
+
+            if tz_name:
+                local = pytz.timezone(tz_name)
+                delayTime = datetime.datetime.strptime(delayTime, DATETIME_FORMAT)
+                local_dt = local.localize(delayTime, is_dst=None)
+                utc_dt = local_dt.astimezone(pytz.UTC)
+                delayTime = utc_dt.strftime(DATETIME_FORMAT)
+
             vals = {
                 "from_id": from_uid,
                 "to_id": session.id,
