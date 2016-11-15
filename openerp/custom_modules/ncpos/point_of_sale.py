@@ -177,6 +177,19 @@ class pos_order(osv.osv):
         else:
             raise osv.except_osv(_('Error!'), _("POS order is empty"))
 
+
+    def _order_fields(self, cr, uid, ui_order, context=None):
+        return {
+            'name':          ui_order['name'],
+            'pos_reference': ui_order.has_key('pos_reference') and ui_order['pos_reference'] or False,
+            'notes':         ui_order.has_key('notes') and ui_order['notes'] or False,
+            'user_id':       ui_order['user_id'] or False,
+            'session_id':    ui_order['pos_session_id'],
+            'lines':         ui_order['lines'],
+
+            'partner_id':    ui_order['partner_id'] or False,
+        }
+
     
     def _process_mobility_order(self, cr, uid, order, context=None):
                 
