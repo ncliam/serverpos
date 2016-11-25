@@ -199,7 +199,7 @@ class res_user(osv.osv):
 
     def get_scheduled_subjects(self, cr, uid, class_id, semester, context=None):
         subjects = []
-        school_admin = self.pool.get("ir.model.data").check_groups(cr, uid, "school_link.group_school_admin")
+        school_admin = self.pool.get("ir.model.access").check_groups(cr, uid, "school_link.group_school_admin")
         if school_admin:
             # return all subject
             subjects = self.pool.get('school.subject').search(cr, uid, [], context=context)
