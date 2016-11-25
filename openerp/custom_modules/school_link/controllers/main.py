@@ -45,9 +45,17 @@ class SchoolLink_Controller(http.Controller):
         cr = request.cr
         hr_employee = registry['hr.employee']
         res_partner = registry['res.partner']
+        res_users = registry['res.users']
         sms_authetication = registry['sms.authentication']
 
         user_id = None
+
+        company_id = res_users._get_company(cr, SUPERUSER_ID, context=context)
+        country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
+        if mobile:
+            mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code),
+                                                phonenumbers.PhoneNumberFormat.E164)
+
         if model:
             if model == 'hr.employee':
                 employee_ids = hr_employee.search(cr, SUPERUSER_ID, [('work_phone',"=", mobile)], context=context)
@@ -59,8 +67,8 @@ class SchoolLink_Controller(http.Controller):
                 partner_ids = res_partner.search(cr, SUPERUSER_ID, [('mobile', "=", mobile), ('customer', "=", False)], context=context)
                 partner_id = partner_ids and partner_ids[0] or None
                 if partner_id:
-                    partner_id = res_partner.browse(cr, SUPERUSER_ID, partner_id, context=context)
-                    user_id = partner_id.parent_user_id and partner_id.parent_user_id.id or None
+                    user_ids = res_users.search(cr, SUPERUSER_ID, [('partner_id','=',partner_id)], limit=1)
+                    user_id = user_ids and user_ids[0] or None
 
         if not user_id:
             raise osv.except_osv(_('Error!'), _("There is no user with this mobile number"))
@@ -96,6 +104,12 @@ class SchoolLink_Controller(http.Controller):
         res_users = registry['res.users']
         sms_authetication = registry['sms.authentication']
 
+        company_id = res_users._get_company(cr, SUPERUSER_ID, context=context)
+        country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
+        if mobile:
+            mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code),
+                                                phonenumbers.PhoneNumberFormat.E164)
+
         if not token_id and mobile:
             token_ids = sms_authetication.search(cr, SUPERUSER_ID, [('res_model','=','res.users'),('mobile', '=', mobile)], limit=1)
             token_id = token_ids and token_ids[0] or None
@@ -112,7 +126,6 @@ class SchoolLink_Controller(http.Controller):
 
         user_id = res_users.browse(cr, SUPERUSER_ID, token.res_id, context=context)
         if user_id:
-            res_users.check_password(cr, user_id, password, context=context)
             res_users.write(cr, SUPERUSER_ID, user_id.id, {'password': password}, context=context)
             return True
 

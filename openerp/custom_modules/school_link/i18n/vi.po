@@ -1,0 +1,818 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* school_link
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0-20160630\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-07 10:10+0000\n"
+"PO-Revision-Date: 2016-11-07 17:23+0700\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: vi\n"
+"X-Generator: Poedit 1.8.11\n"
+
+#. module: school_link
+#: model:email.template,body_html:school_link.registration_code_sms
+msgid ""
+"\n"
+"                \n"
+"                    <p>Your verification code is ${object.name}\"</p>\n"
+"                \n"
+"            "
+msgstr ""
+"\n"
+"                \n"
+"                    <p>Your verification code is ${object.name}\"</p>\n"
+"                \n"
+"            "
+
+#. module: school_link
+#: code:addons/school_link/school.py:51
+#, python-format
+msgid "%s joined the conversation."
+msgstr "%s joined the conversation."
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_class
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new class.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new class.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_exam_move
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new exam move.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new exam move.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_class_group
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new group.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new group.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_schedule
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new schedule.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new schedule.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_scholarity
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new scholarity.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new scholarity.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_students
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new student.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new student.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_subject
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new subject.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new subject.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_teachers
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new teacher.\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a new teacher.\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: model:ir.actions.act_window,help:school_link.action_school_parents
+msgid ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a parent contact\n"
+"              </p>\n"
+"            "
+msgstr ""
+"<p class=\"oe_view_nocontent_create\">\n"
+"                Click to add a parent contact\n"
+"              </p>\n"
+"            "
+
+#. module: school_link
+#: field:school.class,active:0 field:school.scholarity,active:0
+msgid "Active"
+msgstr "Active"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Average"
+msgstr "Trung bình cộng"
+
+#. module: school_link
+#: field:school.schedule.line,begin:0
+msgid "Begin"
+msgstr "Bắt đầu"
+
+#. module: school_link
+#: field:res.users,children:0
+msgid "Children"
+msgstr "Con"
+
+#. module: school_link
+#: field:res.partner,children:0
+msgid "Childs"
+msgstr "Các con"
+
+#. module: school_link
+#: field:res.company,children:0
+msgid "Childs in study"
+msgstr "Các con đang học"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_form
+#: field:school.exam.move,class_id:0 field:school.schedule,class_id:0
+#: field:school.schedule.line,class_id:0
+msgid "Class"
+msgstr "Lớp"
+
+#. module: school_link
+#: view:school.class.group:school_link.view_class_group_form
+msgid "Class group"
+msgstr "Khối"
+
+#. module: school_link
+#: field:hr.employee,class_ids:0
+#: model:ir.actions.act_window,name:school_link.action_school_class
+#: model:ir.ui.menu,name:school_link.menu_school_class
+#: view:school.class:school_link.view_class_filter
+#: view:school.class:school_link.view_class_tree
+msgid "Classes"
+msgstr "Các lớp"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_res_company
+msgid "Companies"
+msgstr "Các công ty"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_filter
+#: view:school.class.group:school_link.view_class_group_filter
+#: view:school.scholarity:school_link.view_scholarity_filter
+#: view:school.subject:school_link.view_subject_filter
+msgid "Company"
+msgstr "Company"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Conduct"
+msgstr "Hạnh kiểm"
+
+#. module: school_link
+#: field:school.class,create_uid:0 field:school.class.group,create_uid:0
+#: field:school.exam.move,create_uid:0 field:school.schedule,create_uid:0
+#: field:school.schedule.line,create_uid:0 field:school.scholarity,create_uid:0
+#: field:school.subject,create_uid:0
+msgid "Created by"
+msgstr "Created by"
+
+#. module: school_link
+#: field:school.class,create_date:0 field:school.class.group,create_date:0
+#: field:school.exam.move,create_date:0 field:school.schedule,create_date:0
+#: field:school.schedule.line,create_date:0
+#: field:school.scholarity,create_date:0 field:school.subject,create_date:0
+msgid "Created on"
+msgstr "Created on"
+
+#. module: school_link
+#: field:school.exam.move,date_exam:0
+msgid "Date"
+msgstr "Date"
+
+#. module: school_link
+#: help:school.exam.move,weight:0 help:school.subject,weight:0
+msgid "Define weight to calculate average"
+msgstr "Define weight to calculate average"
+
+#. module: school_link
+#: field:im_chat.message,delay_time:0
+msgid "Delay Time"
+msgstr "Delay Time"
+
+#. module: school_link
+#: constraint:school.class:0
+msgid "Duplicate class name"
+msgstr "Trùng tên lớp (Duplicate class name)"
+
+#. module: school_link
+#: constraint:school.class.group:0
+msgid "Duplicate group name"
+msgstr "Trùng tên khối (Duplicate name of class group)"
+
+#. module: school_link
+#: constraint:school.subject:0
+msgid "Duplicate subject name"
+msgstr "Trùng tên môn học (Duplicate subject name)"
+
+#. module: school_link
+#: view:school.scholarity:school_link.view_scholarity_form
+msgid "Effective"
+msgstr "Hiệu lực"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_email_template
+msgid "Email Templates"
+msgstr "Các mẫu Email"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_hr_employee
+msgid "Employee"
+msgstr "Người lao động"
+
+#. module: school_link
+#: field:school.schedule.line,end:0
+msgid "End"
+msgstr "Kết thúc"
+
+#. module: school_link
+#: field:school.scholarity,date_end:0
+msgid "End Date"
+msgstr "Ngày kết thúc"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:66
+#: code:addons/school_link/school.py:347 code:addons/school_link/school.py:447
+#: code:addons/school_link/school.py:503 code:addons/school_link/school.py:537
+#: code:addons/school_link/school.py:573
+#, python-format
+msgid "Error!"
+msgstr "Error!"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_exam_move
+#: model:ir.ui.menu,name:school_link.menu_school_exam_move
+#: view:school.exam.move:school_link.view_exam_move_form
+msgid "Exam Move"
+msgstr "Điểm kiểm tra"
+
+#. module: school_link
+#: view:school.exam.move:school_link.view_exam_move_tree
+msgid "Exam Moves"
+msgstr "Danh sách điểm kiểm tra"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Final Exam"
+msgstr "Kiểm tra học kỳ"
+
+#. module: school_link
+#: selection:school.exam.move,semester:0 selection:school.schedule,semester:0
+msgid "First Semester"
+msgstr "Học kỳ 1"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Friday"
+msgstr "Friday"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_form
+msgid "General"
+msgstr "General"
+
+#. module: school_link
+#: help:school.class.group,sequence:0 help:school.subject,sequence:0
+msgid "Gives the sequence order when displaying a list "
+msgstr "Gives the sequence order when displaying a list "
+
+#. module: school_link
+#: view:school.class:school_link.view_class_filter
+#: field:school.class,group_id:0
+msgid "Group"
+msgstr "Group"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_filter
+#: view:school.class.group:school_link.view_class_group_filter
+#: view:school.scholarity:school_link.view_scholarity_filter
+#: view:school.subject:school_link.view_subject_filter
+msgid "Group By"
+msgstr "Group By"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_class_group
+#: model:ir.ui.menu,name:school_link.menu_school_class_group
+#: view:school.class.group:school_link.view_class_group_filter
+msgid "Groups"
+msgstr "Nhóm"
+
+#. module: school_link
+#: field:hr.employee,home_address:0
+msgid "Home Address"
+msgstr "Địa chỉ"
+
+#. module: school_link
+#: field:hr.employee,home_town:0
+msgid "Home town"
+msgstr "Quê quán"
+
+#. module: school_link
+#: field:school.class,id:0 field:school.class.group,id:0
+#: field:school.exam.move,id:0 field:school.schedule,id:0
+#: field:school.schedule.line,id:0 field:school.scholarity,id:0
+#: field:school.subject,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_form
+#: view:school.class.group:school_link.view_class_group_form
+#: view:school.exam.move:school_link.view_exam_move_form
+#: view:school.scholarity:school_link.view_scholarity_form
+#: view:school.subject:school_link.view_subject_form
+msgid "Information"
+msgstr "Information"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:104
+#: code:addons/school_link/controllers/main.py:225
+#, python-format
+msgid "Invalid Token"
+msgstr "Mã token không hợp lệ"
+
+#. module: school_link
+#: code:addons/school_link/school.py:159
+#, python-format
+msgid "Invalid school selected"
+msgstr "Chọn trường không hợp lệ"
+
+#. module: school_link
+#: code:addons/school_link/school.py:216
+#, python-format
+msgid "Invalid verification code (Expired or Cancelled)."
+msgstr "Mã kiểm tra không hợp lệ (có thể hết hạn hoặc bị huỷ)."
+
+#. module: school_link
+#: field:im_chat.message,self_notify:0
+msgid "Is Self Notification"
+msgstr "Is Self Notification"
+
+#. module: school_link
+#: field:hr.employee,student:0
+msgid "Is a Student"
+msgstr "Is a Student"
+
+#. module: school_link
+#: field:hr.employee,teacher:0
+msgid "Is a Teacher"
+msgstr "Is a Teacher"
+
+#. module: school_link
+#: field:hr.employee,last_name:0
+msgid "Last Name"
+msgstr "Last Name"
+
+#. module: school_link
+#: field:school.class,write_uid:0 field:school.class.group,write_uid:0
+#: field:school.exam.move,write_uid:0 field:school.schedule,write_uid:0
+#: field:school.schedule.line,write_uid:0 field:school.scholarity,write_uid:0
+#: field:school.subject,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: school_link
+#: field:school.class,write_date:0 field:school.class.group,write_date:0
+#: field:school.exam.move,write_date:0 field:school.schedule,write_date:0
+#: field:school.schedule.line,write_date:0 field:school.scholarity,write_date:0
+#: field:school.subject,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: school_link
+#: view:school.schedule:school_link.view_school_schedule_form
+msgid "Lines"
+msgstr "Lines"
+
+#. module: school_link
+#: field:school.exam.move,mark:0
+msgid "Mark"
+msgstr "Mark"
+
+#. module: school_link
+#: view:school.exam.move:school_link.view_exam_move_form
+msgid "Marks"
+msgstr "Marks"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_form
+msgid "Members"
+msgstr "Members"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Monday"
+msgstr "Monday"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_filter field:school.class,name:0
+#: view:school.class.group:school_link.view_class_group_filter
+#: field:school.class.group,name:0 field:school.exam.move,name:0
+#: field:school.schedule,name:0 field:school.schedule.line,name:0
+#: view:school.scholarity:school_link.view_scholarity_filter
+#: view:school.subject:school_link.view_subject_filter
+#: field:school.subject,name:0
+msgid "Name"
+msgstr "Name"
+
+#. module: school_link
+#: code:addons/school_link/school.py:210
+#, python-format
+msgid "No verification code"
+msgstr "Không thấy mã kiểm tra"
+
+#. module: school_link
+#: constraint:school.schedule:0
+msgid "One schedule allowed only for a semester of class"
+msgstr "One schedule allowed only for a semester of class"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Overall"
+msgstr "Tổng kết"
+
+#. module: school_link
+#: field:hr.employee,parent_ids:0
+#: model:ir.actions.act_window,name:school_link.action_school_parents
+#: model:ir.ui.menu,name:school_link.menu_school_parent
+#: field:school.class,parent_ids:0
+msgid "Parents"
+msgstr "Phụ huynh"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_res_partner
+msgid "Partner"
+msgstr "Đối tác"
+
+#. module: school_link
+#: model:email.template,subject:school_link.registration_code_sms
+msgid "Registration code"
+msgstr "Mã đăng ký"
+
+#. module: school_link
+#: field:res.users,school_ids:0
+msgid "Related Schools"
+msgstr "Trường học liên quan"
+
+#. module: school_link
+#: field:res.partner,parent_user_id:0
+msgid "Related User"
+msgstr "Tài khoản người dùng"
+
+#. module: school_link
+#: field:school.class,teacher_id:0
+msgid "Responsible"
+msgstr "Chủ nhiệm"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_sms_authentication
+msgid "SMS authentication"
+msgstr "SMS authentication"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Saturday"
+msgstr "Saturday"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_schedule
+#: model:ir.ui.menu,name:school_link.menu_school_schedule
+#: view:school.schedule:school_link.view_school_schedule_form
+#: view:school.schedule:school_link.view_school_schedule_tree
+msgid "Schedule"
+msgstr "Schedule"
+
+#. module: school_link
+#: view:school.schedule:school_link.view_school_schedule_form
+msgid "Schedule Lines"
+msgstr "Schedule Lines"
+
+#. module: school_link
+#: field:school.schedule.line,schedule_id:0
+msgid "Schedule Ref"
+msgstr "Schedule Ref"
+
+#. module: school_link
+#: field:school.schedule,lines:0
+msgid "Schedulle Lines"
+msgstr "Schedulle Lines"
+
+#. module: school_link
+#: view:school.scholarity:school_link.view_scholarity_filter
+#: view:school.scholarity:school_link.view_scholarity_tree
+msgid "Scholarities"
+msgstr "Các năm học"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_scholarity
+#: model:ir.ui.menu,name:school_link.menu_school_scholarity
+#: view:school.scholarity:school_link.view_scholarity_form
+msgid "Scholarity"
+msgstr "Năm học"
+
+#. module: school_link
+#: field:school.scholarity,name:0
+msgid "Scholarity Year"
+msgstr "Năm học"
+
+#. module: school_link
+#: field:res.company,school:0 field:school.class,company_id:0
+#: field:school.class.group,company_id:0 field:school.exam.move,company_id:0
+#: field:school.schedule,company_id:0 field:school.scholarity,company_id:0
+#: field:school.subject,company_id:0
+msgid "School"
+msgstr "School"
+
+#. module: school_link
+#: model:ir.ui.menu,name:school_link.menu_school_link_admin
+#: model:res.groups,name:school_link.group_school_admin
+msgid "School Admin"
+msgstr "School Admin"
+
+#. module: school_link
+#: view:hr.employee:school_link.view_employee_form
+#: model:ir.ui.menu,name:school_link.menu_school_link_root
+#: view:res.company:school_link.view_company_form
+#: view:res.partner:school_link.view_partner_form
+#: view:res.users:school_link.view_users_form
+msgid "School Link"
+msgstr "School Link"
+
+#. module: school_link
+#: model:res.groups,name:school_link.group_school_super_admin
+msgid "School Link Admin"
+msgstr "School Link Admin"
+
+#. module: school_link
+#: model:ir.module.category,name:school_link.module_category_school
+msgid "School Link Role"
+msgstr "School Link Role"
+
+#. module: school_link
+#: model:res.groups,name:school_link.group_school_parent
+msgid "School Parent"
+msgstr "School Parent"
+
+#. module: school_link
+#: model:ir.ui.menu,name:school_link.menu_school_link_teacher
+#: model:res.groups,name:school_link.group_school_teacher
+msgid "School Teacher"
+msgstr "School Teacher"
+
+#. module: school_link
+#: selection:school.exam.move,semester:0 selection:school.schedule,semester:0
+msgid "Second Semester"
+msgstr "Second Semester"
+
+#. module: school_link
+#: field:school.exam.move,semester:0 field:school.schedule,semester:0
+msgid "Semester"
+msgstr "Học kỳ"
+
+#. module: school_link
+#: field:school.class.group,sequence:0 field:school.exam.move,sequence:0
+#: field:school.subject,sequence:0
+msgid "Sequence"
+msgstr "Sequence"
+
+#. module: school_link
+#: help:school.exam.move,sequence:0
+msgid "Sort by order"
+msgstr "Sort by order"
+
+#. module: school_link
+#: field:school.scholarity,date_start:0
+msgid "Start Date"
+msgstr "Start Date"
+
+#. module: school_link
+#: field:school.exam.move,student_id:0
+msgid "Student"
+msgstr "Học sinh"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_students
+#: model:ir.ui.menu,name:school_link.menu_school_students
+#: field:school.class,student_ids:0
+msgid "Students"
+msgstr "Danh sách học sinh"
+
+#. module: school_link
+#: field:school.exam.move,subject_id:0 field:school.schedule.line,subject_id:0
+#: view:school.subject:school_link.view_subject_form
+msgid "Subject"
+msgstr "Môn học"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_subject
+#: model:ir.ui.menu,name:school_link.menu_school_subject
+#: view:school.class.group:school_link.view_class_group_tree
+#: view:school.subject:school_link.view_subject_filter
+#: view:school.subject:school_link.view_subject_tree
+msgid "Subjects"
+msgstr "Danh sách môn học"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Sunday"
+msgstr "Sunday"
+
+#. module: school_link
+#: model:ir.ui.menu,name:school_link.menu_school_link_configuration
+msgid "System Admin"
+msgstr "System Admin"
+
+#. module: school_link
+#: field:school.exam.move,teacher_id:0 field:school.schedule.line,teacher_id:0
+msgid "Teacher"
+msgstr "Giáo viên"
+
+#. module: school_link
+#: model:ir.actions.act_window,name:school_link.action_school_teachers
+#: model:ir.ui.menu,name:school_link.menu_school_teacher
+#: field:school.class,teacher_ids:0
+msgid "Teachers"
+msgstr "Danh sách giáo viên"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_form
+msgid "Teachers and Parents"
+msgstr "Teachers and Parents"
+
+#. module: school_link
+#: field:hr.employee,teaching_class_ids:0
+msgid "Teaching Classes"
+msgstr "Teaching Classes"
+
+#. module: school_link
+#: field:hr.employee,subject_ids:0
+msgid "Teaching Subjects"
+msgstr "Teaching Subjects"
+
+#. module: school_link
+#: code:addons/school_link/school.py:347 code:addons/school_link/school.py:447
+#: code:addons/school_link/school.py:503 code:addons/school_link/school.py:537
+#: code:addons/school_link/school.py:573
+#, python-format
+msgid "There is no default company for the current user!"
+msgstr "There is no default company for the current user!"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:66
+#, python-format
+msgid "There is no user with this mobile number"
+msgstr "Không thấy người dùng đăng ký với số di động này"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Thursday"
+msgstr "Thursday"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:237
+#, python-format
+msgid "Token is not found"
+msgstr "Không tìm thấy token này"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Tuesday"
+msgstr "Tuesday"
+
+#. module: school_link
+#: field:school.exam.move,type:0
+msgid "Type"
+msgstr "Type"
+
+#. module: school_link
+#: model:ir.model,name:school_link.model_res_users
+msgid "Users"
+msgstr "Người dùng"
+
+#. module: school_link
+#: selection:school.schedule.line,week_day:0
+msgid "Wednesday"
+msgstr "Wednesday"
+
+#. module: school_link
+#: field:school.schedule.line,week_day:0
+msgid "Week Day"
+msgstr "Week Day"
+
+#. module: school_link
+#: field:school.exam.move,weight:0 field:school.subject,weight:0
+msgid "Weight"
+msgstr "Hệ số"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Weight 1"
+msgstr "Hệ số 1"
+
+#. module: school_link
+#: selection:school.exam.move,type:0
+msgid "Weight 2"
+msgstr "Hệ số 2"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:174
+#, python-format
+msgid "Wrong use API"
+msgstr "Wrong use API"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:111
+#: code:addons/school_link/controllers/main.py:202
+#: code:addons/school_link/school.py:219
+#, python-format
+msgid "Wrong verification code"
+msgstr "Sai mã kiểm tra"
+
+#. module: school_link
+#: view:school.class:school_link.view_class_filter field:school.class,year_id:0
+msgid "Year"
+msgstr "Year"
+
+#. module: school_link
+#: code:addons/school_link/school.py:790
+#, python-format
+msgid "You have just sent a timer message."
+msgstr "Bạn vừa gửi một tin nhắn hẹn giờ"
+
+#. module: school_link
+#: code:addons/school_link/controllers/main.py:104
+#: code:addons/school_link/controllers/main.py:111
+#: code:addons/school_link/controllers/main.py:174
+#: code:addons/school_link/controllers/main.py:202
+#: code:addons/school_link/controllers/main.py:225
+#: code:addons/school_link/controllers/main.py:237
+#: code:addons/school_link/school.py:159 code:addons/school_link/school.py:210
+#: code:addons/school_link/school.py:216 code:addons/school_link/school.py:219
+#, python-format
+msgid "error!"
+msgstr "error!"

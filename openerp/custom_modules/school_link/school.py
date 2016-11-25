@@ -24,8 +24,13 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 import pytz, datetime
-
 from ast import literal_eval
+
+from onesignal import OneSignal
+
+USER_AUTH_KEY = 'NWQ4ZDNiMjUtYTdhNS00YTBhLTg2MTctYjlmOTM0OTdhZjBi'
+YOUR_APP_ID = '3fcdf8f2-9523-4ca7-8489-fefb29cbecc4'
+REST_API_KEY = 'MDdjN2JjZDctNWE2ZS00ZGNjLTlkNmEtNTRkYmUwYzBjZjc3'
 
 class im_chat_session(osv.osv):
     _inherit = 'im_chat.session'
@@ -192,6 +197,27 @@ class res_user(osv.osv):
 
         return result
 
+    def get_scheduled_subjects(self, cr, uid, class_id, semester, context=None):
+        subjects = []
+        school_admin = self.pool.get("ir.model.data").check_groups(cr, uid, "school_link.group_school_admin")
+        if school_admin:
+            # return all subject
+            subjects = self.pool.get('school.subject').search(cr, uid, [], context=context)
+            return subjects
+
+        schedule_ids = self.pool.get('school.schedule').search(cr, uid,
+                                    [('class_id','=',class_id), ('semester','=', semester)], context=context)
+        schedule_line_ids = self.pool.get('school.schedule.line').search(cr, uid, [('schedule_id','in', schedule_ids)], context=context)
+        schedule_lines = self.pool.get('school.schedule.line').browse(cr, uid, schedule_line_ids, context=context)
+        for line in schedule_lines:
+            if line.teacher_id and line.teacher_id.user_id and line.teacher_id.user_id.id == uid:
+                subjects.append(line.subject_id.id)
+
+        if len(subjects) > 0:
+            # Prevent Duplicate by search from database
+            subjects = self.pool.get('school.subject').search(cr, uid, [('id', 'in', subjects)], context=context)
+        return subjects
+
     _columns = {
         'school_ids': fields.function(get_relate_schools, relation='res.company', type='many2many',
                                            string='Related Schools', readonly=True),
@@ -336,7 +362,7 @@ class res_company(osv.osv):
 class hr_employee(osv.osv):
     _name = "hr.employee"
     _inherit = ['hr.employee', 'phone.common']
-    _phone_fields = ['work_phone', 'mobile_phone']
+    _phone_fields = ['work_phone']
     _phone_name_sequence = 10
     _country_field = None
     _partner_field = None
@@ -348,6 +374,10 @@ class hr_employee(osv.osv):
         return company_id
 
     def create(self, cr, uid, vals, context=None):
+        if context is None:
+            context = {}
+        context = dict(context, mail_create_nosubscribe=True)
+
         vals_reformated = self._generic_reformat_phonenumbers(
             cr, uid, None, vals, context=context)
         return super(hr_employee, self).create(
@@ -421,12 +451,6 @@ class hr_employee(osv.osv):
     _defaults = {
         'company_id': _get_default_company,
     }
-
-    def create(self, cr, uid, values, context=None):
-        if context is None:
-            context = {}
-        context = dict(context, mail_create_nosubscribe=True)
-        return super(hr_employee, self).create(cr, uid, values, context=context)
 
     def create_multi(self, cr, uid, datas, context=None):
         if context is None:
@@ -607,7 +631,7 @@ class school_class(osv.osv):
         for school_class in self.browse(cr, uid, ids, context=None):
             domain = [
                 ('name', '=', school_class.name),
-                ('year_id', '=', school_class.year_id.id)
+                ('year_id', '=', school_class.year_id.id),
                 ('company_id','=', school_class.company_id.id)
             ]
             count = self.search_count(cr, uid, domain, context=context)
@@ -722,7 +746,7 @@ class school_schedule(osv.osv):
         return True
 
     _constraints = [
-        (_check_duplicate, 'One schedule allowed only for a semester of class',['class_id','semester','company_id']),
+        #(_check_duplicate, 'One schedule allowed only for a semester of class',['class_id','semester','company_id']),
     ]
 
 
@@ -773,7 +797,13 @@ class im_chat_message(osv.Model):
             domain = [("to_id.uuid", "=", uuid),("delay_time", '=', None)]
             if last_id:
                 domain.append(("id", "<", last_id));
-            return self.search_read(cr, uid, domain, ['id', 'create_date','to_id','from_id', 'type', 'message'], limit=limit, context=context)
+            messages = self.search_read(cr, uid, domain, ['id', 'create_date','to_id','from_id', 'type', 'message'], limit=limit, context=context)
+            for message in messages:
+                timeStamp = fields.datetime.context_timestamp(cr, uid, datetime.datetime.strptime(message['create_date'],
+                                                                                         DATETIME_FORMAT),
+                                                              context=context)
+                message['create_date'] = timeStamp.strftime(DATETIME_FORMAT)
+            return messages
         return False
 
     def post_delay(self, cr, uid, from_uid, uuid, message_type, message_content, delayTime, context=None):
@@ -825,6 +855,8 @@ class im_chat_message(osv.Model):
         return message_id
 
     def broadcast_delay(self, cr, uid, context=None):
+        one_signal = OneSignal(REST_API_KEY, YOUR_APP_ID)
+
         now = datetime.datetime.now().strftime(DATETIME_FORMAT)
         delay_ids = self.search(cr, SUPERUSER_ID, [('delay_time','<=', now)], context=context)
         if delay_ids and len(delay_ids) > 0:
@@ -839,9 +871,17 @@ class im_chat_message(osv.Model):
                 if session_id:
                     session = self.pool['im_chat.session'].browse(cr, SUPERUSER_ID, session_id, context=context)
                     notifications.append([uuid, data])
+
+                    filterTag = []
                     for user in session.user_ids:
                         notifications.append([(cr.dbname, 'im_chat.session', user.id), data])
+                        if len(filterTag) > 0:
+                            filterTag.append({"operator": "OR"});
+                        filterTag.append({"field": "tag", "key": "user_id", "relation": "=", "value": str(user.id)});
+
+
                     self.pool['bus.bus'].sendmany(cr, uid, notifications)
+                    one_signal.create_notification(data['message'], filters=filterTag, included_segments=None)
 
             # Clear delaytime
             self.write(cr, SUPERUSER_ID, delay_ids, {'delay_time': None}, context=context)
