@@ -49,13 +49,6 @@ class SchoolLink_Controller(http.Controller):
         sms_authetication = registry['sms.authentication']
 
         user_id = None
-
-        company_id = res_users._get_company(cr, SUPERUSER_ID, context=context)
-        country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
-        if mobile:
-            mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code),
-                                                phonenumbers.PhoneNumberFormat.E164)
-
         if model:
             if model == 'hr.employee':
                 employee_ids = hr_employee.search(cr, SUPERUSER_ID, [('work_phone',"=", mobile)], context=context)
@@ -104,12 +97,6 @@ class SchoolLink_Controller(http.Controller):
         res_users = registry['res.users']
         sms_authetication = registry['sms.authentication']
 
-        company_id = res_users._get_company(cr, SUPERUSER_ID, context=context)
-        country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
-        if mobile:
-            mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code),
-                                                phonenumbers.PhoneNumberFormat.E164)
-
         if not token_id and mobile:
             token_ids = sms_authetication.search(cr, SUPERUSER_ID, [('res_model','=','res.users'),('mobile', '=', mobile)], limit=1)
             token_id = token_ids and token_ids[0] or None
@@ -138,18 +125,14 @@ class SchoolLink_Controller(http.Controller):
         registry = request.registry
         cr = request.cr
         company_id = registry['res.users']._get_company(cr, SUPERUSER_ID, context=context)
-        if not country_code:
-            country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
 
         # Create partner with mobile number
         res_partner = registry['res.partner']
         sms_authetication = registry['sms.authentication']
         if mobile:
-            formatted_mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code), phonenumbers.PhoneNumberFormat.E164)
             partner_id = None
-            existed = res_partner.search(cr, SUPERUSER_ID, [('mobile',"=", formatted_mobile),('customer',"=", False)], context=context)
+            existed = res_partner.search(cr, SUPERUSER_ID, [('mobile',"=", mobile),('customer',"=", False)], context=context)
             if not existed:
-
                 partner_data = {
                     'name': mobile,
                     'mobile': mobile,
@@ -161,7 +144,7 @@ class SchoolLink_Controller(http.Controller):
             else:
                 parner_id = existed and existed[0] or None
 
-            token = sms_authetication.search(cr, SUPERUSER_ID, [('state', '=', 'sent'),('mobile','=', formatted_mobile)], limit=1)
+            token = sms_authetication.search(cr, SUPERUSER_ID, [('state', '=', 'sent'),('mobile','=', mobile)], limit=1)
             if token and token[0]:
                 token = sms_authetication.browse(cr, SUPERUSER_ID, token[0])
                 if datetime.datetime.strptime(token.validity, "%Y-%m-%d %H:%M:%S") <= datetime.datetime.now():
@@ -196,11 +179,6 @@ class SchoolLink_Controller(http.Controller):
         res_partner = registry['res.partner']
         sms_authetication = registry['sms.authentication']
         company_id = res_users._get_company(cr, SUPERUSER_ID, context=context)
-        if not country_code:
-            country_code = registry['res.company'].browse(cr, SUPERUSER_ID, company_id, context=context).country_id.code
-
-        if mobile:
-            mobile = phonenumbers.format_number(phonenumbers.parse(mobile, country_code), phonenumbers.PhoneNumberFormat.E164)
 
         if not token_id and mobile:
             token_ids = sms_authetication.search(cr, SUPERUSER_ID, [('state', '=', 'sent'),('mobile', '=', mobile)], limit=1)
@@ -216,10 +194,10 @@ class SchoolLink_Controller(http.Controller):
 
             user_id = res_users.search(cr, SUPERUSER_ID, [('partner_id.mobile','=', mobile)], context=context, limit=1)
             user_id = user_id and user_id[0] or None
-            #TODO: Neu co user_id roi thi se thong bao loi
 
-            if not user_id:
-
+            if user_id:
+                raise osv.except_osv(_('error!'), _("The user got this mobile number already registered."))
+            else:
                 partner_id = res_partner.browse(cr, SUPERUSER_ID, token.res_id, context=context)
                 dummy, group_id = registry["ir.model.data"].get_object_reference(cr, SUPERUSER_ID, 'school_link','group_school_parent')
 

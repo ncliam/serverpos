@@ -62,26 +62,6 @@ class im_chat_session(osv.osv):
             users_infos = self.pool["res.users"].read(cr, SUPERUSER_ID, [u.id for u in session.user_ids], ['id','name', 'im_status'], context=context)
             return users_infos
 
-class sms_authentication(osv.osv):
-    _name = 'sms.authentication'
-    _inherit = ['sms.authentication', 'phone.common']
-    _phone_fields = ['mobile']
-    _phone_name_sequence = 10
-    _country_field = None
-    _partner_field = None
-
-    def create(self, cr, uid, vals, context=None):
-        vals_reformated = self._generic_reformat_phonenumbers(
-            cr, uid, None, vals, context=context)
-        return super(sms_authentication, self).create(
-            cr, uid, vals_reformated, context=context)
-
-    def write(self, cr, uid, ids, vals, context=None):
-        vals_reformated = self._generic_reformat_phonenumbers(
-            cr, uid, ids, vals, context=context)
-        return super(sms_authentication, self).write(
-            cr, uid, ids, vals_reformated, context=context)
-
 class email_template(osv.osv):
     _inherit = "email.template"
 
@@ -277,6 +257,12 @@ class res_user(osv.osv):
 class res_partner(osv.osv):
     _inherit = 'res.partner'
 
+    def _get_default_company(self, cr, uid, context=None):
+        company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
+        if not company_id:
+            raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
+        return company_id
+
     def get_parent_user(self, cr, uid, ids, name, args, context=None):
         res = {}
         for partner_id in self.browse(cr, SUPERUSER_ID, ids, context=context):
@@ -312,6 +298,10 @@ class res_partner(osv.osv):
             domain="[('type', '=', 'receivable')]",
             help="This account will be used instead of the default one as the receivable account for the current partner",
             required=False),
+    }
+
+    _defaults = {
+        'company_id': _get_default_company,
     }
 
     def create_multi(self, cr, uid, datas, context=None):
@@ -366,33 +356,13 @@ class res_company(osv.osv):
 
 class hr_employee(osv.osv):
     _name = "hr.employee"
-    _inherit = ['hr.employee', 'phone.common']
-    _phone_fields = ['work_phone']
-    _phone_name_sequence = 10
-    _country_field = None
-    _partner_field = None
+    _inherit = ['hr.employee']
 
     def _get_default_company(self, cr, uid, context=None):
         company_id = self.pool.get('res.users')._get_company(cr, uid, context=context)
         if not company_id:
             raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
         return company_id
-
-    def create(self, cr, uid, vals, context=None):
-        if context is None:
-            context = {}
-        context = dict(context, mail_create_nosubscribe=True)
-
-        vals_reformated = self._generic_reformat_phonenumbers(
-            cr, uid, None, vals, context=context)
-        return super(hr_employee, self).create(
-            cr, uid, vals_reformated, context=context)
-
-    def write(self, cr, uid, ids, vals, context=None):
-        vals_reformated = self._generic_reformat_phonenumbers(
-            cr, uid, ids, vals, context=context)
-        return super(hr_employee, self).write(
-            cr, uid, ids, vals_reformated, context=context)
 
     def name_get(self, cr, uid, ids, context=None):
         res = []
