@@ -280,18 +280,23 @@ class res_partner(osv.osv):
     def get_parent_user(self, cr, uid, ids, name, args, context=None):
         res = {}
         for partner_id in self.browse(cr, SUPERUSER_ID, ids, context=context):
+            res[partner_id.id] = {}
             mobile = partner_id.mobile
             if mobile:
                 same_mobile_ids = self.search(cr, SUPERUSER_ID, [('mobile','=',mobile)], context=context)
                 related_users = self.pool.get('res.users').search(cr, SUPERUSER_ID, [('partner_id','in', same_mobile_ids)], context=context)
-                res[partner_id.id] = related_users and related_users[0] or None
+                res[partner_id.id]['parent_user_id'] = related_users and related_users[0] or None
+                user_partner_id = related_users and self.pool.get('res.users').browse(cr, uid, related_users[0], context=context).partner_id.id or None
+                res[partner_id.id]['parent_partner_id'] = user_partner_id
             else:
-                res[partner_id.id] = None
+                res[partner_id.id]['parent_user_id'] = None
+                res[partner_id.id]['parent_partner_id'] = None
         return res
 
     _columns = {
         'children': fields.many2many('hr.employee', 'parent_student_rel', 'student_id', 'partner_id', 'Childs', readonly=True),
-        'parent_user_id': fields.function(get_parent_user, relation='res.users', type='many2one', string='Related User', readonly=True),
+        'parent_user_id': fields.function(get_parent_user, multi="parent_user_partner", relation='res.users', type='many2one', string='Related User', readonly=True),
+        'parent_partner_id': fields.function(get_parent_user, multi="parent_user_partner", relation='res.partner', type='many2one', string='Related User', readonly=True),
 
         'property_account_payable': fields.property(
             type='many2one',

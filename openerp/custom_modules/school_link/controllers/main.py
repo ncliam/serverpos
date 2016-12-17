@@ -216,6 +216,8 @@ class SchoolLink_Controller(http.Controller):
 
             user_id = res_users.search(cr, SUPERUSER_ID, [('partner_id.mobile','=', mobile)], context=context, limit=1)
             user_id = user_id and user_id[0] or None
+            #TODO: Neu co user_id roi thi se thong bao loi
+
             if not user_id:
 
                 partner_id = res_partner.browse(cr, SUPERUSER_ID, token.res_id, context=context)
