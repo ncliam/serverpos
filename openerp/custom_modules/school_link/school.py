@@ -272,7 +272,7 @@ class res_partner(osv.osv):
                 same_mobile_ids = self.search(cr, SUPERUSER_ID, [('mobile','=',mobile)], context=context)
                 related_users = self.pool.get('res.users').search(cr, SUPERUSER_ID, [('partner_id','in', same_mobile_ids)], context=context)
                 res[partner_id.id]['parent_user_id'] = related_users and related_users[0] or None
-                user_partner_id = related_users and self.pool.get('res.users').browse(cr, uid, related_users[0], context=context).partner_id.id or None
+                user_partner_id = related_users and self.pool.get('res.users').browse(cr, SUPERUSER_ID, related_users[0], context=context).partner_id.id or None
                 res[partner_id.id]['parent_partner_id'] = user_partner_id
             else:
                 res[partner_id.id]['parent_user_id'] = None
@@ -833,6 +833,19 @@ class im_chat_message(osv.Model):
         one_signal = OneSignal(REST_API_KEY, YOUR_APP_ID)
 
         now = datetime.datetime.now().strftime(DATETIME_FORMAT)
+        if context and context.get('tz'):
+            tz_name = context['tz']
+        else:
+            user = self.pool['res.users'].browse(cr, SUPERUSER_ID, uid)
+            tz_name = user.tz
+
+        if tz_name:
+            local = pytz.timezone(tz_name)
+            now = datetime.datetime.strptime(now, DATETIME_FORMAT)
+            local_dt = local.localize(now, is_dst=None)
+            utc_dt = local_dt.astimezone(pytz.UTC)
+            now = utc_dt.strftime(DATETIME_FORMAT)
+
         delay_ids = self.search(cr, SUPERUSER_ID, [('delay_time','<=', now)], context=context)
         if delay_ids and len(delay_ids) > 0:
             for message_id in delay_ids:
